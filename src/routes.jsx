@@ -12,6 +12,7 @@ import NotFound from './pages/NotFound';
 
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
+import UIKitPage from './pages/UIKitPage';
 
 // 3. สร้าง "แผนที่เว็บ"
 export const router = createBrowserRouter([
@@ -47,6 +48,10 @@ export const router = createBrowserRouter([
       {
         path: 'signup',
         element: <SignupPage />,
+      },
+      {
+        path: 'test_ui',
+        element: <UIKitPage />,
       },
     ],
   },
