@@ -54,6 +54,7 @@ export default function Navbar() {
         <Link to="/my-bookings">My Bookings</Link>
         <Link to="/login">Login</Link>
         <Link to="/signup">Sign Up</Link>
+        <Link to="/test_ui">UI Kit Test</Link>
         
       </NavLinks>
     </NavWrapper>
