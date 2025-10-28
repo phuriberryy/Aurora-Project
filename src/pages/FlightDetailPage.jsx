@@ -1,0 +1,1 @@
+export default function FlightDetailPage() { return <div>Flight Detail Page (B)</div>; }

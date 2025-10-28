@@ -1,0 +1,1 @@
+export default function FlightsPage() { return <div>Flights Page (B)</div>; }
