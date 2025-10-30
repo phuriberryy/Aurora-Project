@@ -1,39 +1,67 @@
 import { createSlice, createAsyncThunk, nanoid } from '@reduxjs/toolkit';
 
 const API_BASE = process.env.REACT_APP_API_BASE_URL || '';
+const BOOKINGS_PATH = process.env.REACT_APP_BOOKINGS_PATH || '/bookings';
+const FAKE_CONFIRM = String(process.env.REACT_APP_FAKE_CONFIRM_ON_ERROR).toLowerCase() === 'true';
+const SEAT_RESERVE_PATH = process.env.REACT_APP_SEAT_RESERVE_PATH || '/seat-reservations';
 
 export const submitBooking = createAsyncThunk(
   'booking/submitBooking',
   async (payload, { rejectWithValue, signal }) => {
+    const randomPNR = () => Array.from({ length: 6 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 34)]).join('');
+    const asConfirmation = (data) => ({
+      ...data,
+      bookingId: data?.bookingId || data?.id || `FAKE-${Date.now()}`,
+      pnr: data?.pnr || randomPNR()
+    });
     try {
-      const res = await fetch(`${API_BASE}/bookings`, {
+      // 1) Create booking
+      const res = await fetch(`${API_BASE}${BOOKINGS_PATH}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
         signal
       });
+      let confirmation;
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
-        return rejectWithValue({
-          status: res.status,
-          message: err?.message || 'Failed to submit booking'
-        });
+        if (FAKE_CONFIRM) {
+          confirmation = asConfirmation(payload);
+        } else {
+          return rejectWithValue({ status: res.status, message: err?.message || 'Failed to submit booking' });
+        }
+      } else {
+        const data = await res.json();
+        confirmation = asConfirmation(data);
       }
-      const data = await res.json();
-      const randomPNR = () => Array.from({ length: 6 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 34)]).join('');
-      const confirmation = {
-        ...data,
-        bookingId: data.bookingId || data.id,
-        pnr: data.pnr || randomPNR()
-      };
+
+      // 2) Reserve seat (best-effort; do not block confirmation)
+      try {
+        const seatCode = payload?.extras?.seatPref;
+        if (seatCode && seatCode !== 'AUTO') {
+          await fetch(`${API_BASE}${SEAT_RESERVE_PATH}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              flightId: payload?.flightId || payload?.flight?.id || payload?.flight_id,
+              seat: seatCode,
+              status: 'RESERVED',
+              bookingId: confirmation.bookingId,
+            }),
+            signal
+          }).catch(()=>{});
+        }
+      } catch (_) { /* ignore seat reserve errors */ }
+
       return confirmation;
     } catch (e) {
+      if (FAKE_CONFIRM) {
+        return asConfirmation(payload);
+      }
       return rejectWithValue({ message: e.message || 'Network error' });
     }
   }
-);
-
-const initialState = {
+);const initialState = {
   id: null, // local temp id for UI
   flight: null, // {id, carrier, flightNo, depart, arrive, price}
   passengers: [
@@ -146,6 +174,8 @@ export const selectPrice = (state) => state.booking.price;
 export const selectStep = (state) => state.booking.step;
 
 export default bookingSlice.reducer;
+
+
 
 
 
