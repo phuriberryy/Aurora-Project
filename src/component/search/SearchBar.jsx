@@ -1,22 +1,39 @@
 import PropTypes from "prop-types";
 import styled from "styled-components";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 import Select from "../ui/Select";
 
 const Card = styled.form`
   display: grid;
-  gap: 18px;
+  gap: 22px;
   padding: 24px;
   margin: 20px 0 24px;
   border-radius: 18px;
   border: 1px solid rgba(15, 36, 84, 0.12);
   background: ${({ theme }) => theme.colors.white};
   box-shadow: 0 18px 32px -18px rgba(15, 36, 84, 0.35);
+`;
 
-  @media (max-width: 768px) {
-    padding: 20px;
+const ToggleRow = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+`;
+
+const ToggleButton = styled.button`
+  padding: 8px 20px;
+  border-radius: 20px;
+  border: 1px solid ${({ active }) => (active ? "#0077cc" : "#ccc")};
+  background: ${({ active }) => (active ? "#0077cc" : "#f8f8f8")};
+  color: ${({ active }) => (active ? "#fff" : "#333")};
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  &:hover {
+    background: ${({ active }) => (active ? "#006bb3" : "#eaeaea")};
   }
 `;
 
@@ -51,7 +68,7 @@ const Actions = styled.div`
 `;
 
 const Validation = styled.small`
-  color: #d64545;
+  color: #696969;
 `;
 
 const SearchButton = styled(Button)`
@@ -60,22 +77,36 @@ const SearchButton = styled(Button)`
   border-radius: 8px;
 `;
 
-export default function SearchBar({ value, onChange, onSearch, options = { origins: [], destinations: [] }, isLoadingOptions = false }) {
+export default function SearchBar({
+  value,
+  onChange,
+  onSearch,
+  options = { origins: [], destinations: [] },
+  isLoadingOptions = false,
+}) {
+  const [tripType, setTripType] = useState("oneway"); // ✅ one-way / return
+
   const from = value.from ?? "";
   const to = value.to ?? "";
-  const date = value.date ?? "";
+  const departDate = value.date ?? "";
+  const returnDate = value.returnDate ?? "";
 
   const { origins = [], destinations = [] } = options;
 
   const trimmed = useMemo(
-    () => ({ from: from.trim(), to: to.trim(), date }),
-    [from, to, date]
+    () => ({
+      from: from.trim(),
+      to: to.trim(),
+      date: departDate,
+      returnDate,
+    }),
+    [from, to, departDate, returnDate]
   );
 
-  const hasEmpty = !trimmed.from || !trimmed.to || !trimmed.date;
+  const hasEmpty =
+    !trimmed.from || !trimmed.to || !trimmed.date || (tripType === "return" && !trimmed.returnDate);
   const sameRoute = trimmed.from && trimmed.to && trimmed.from === trimmed.to;
 
-  // กันวันที่ย้อนหลัง (yyyy-mm-dd)
   const pastDate = useMemo(() => {
     if (!trimmed.date) return false;
     const today = new Date();
@@ -88,7 +119,9 @@ export default function SearchBar({ value, onChange, onSearch, options = { origi
 
   let validationMessage = "";
   if (hasEmpty) {
-    validationMessage = "Please select departure, destination, and date.";
+    validationMessage = tripType === "return"
+      ? "Please select all fields including return date."
+      : "Please select departure, destination, and date.";
   } else if (sameRoute) {
     validationMessage = "Departure and destination must be different.";
   } else if (pastDate) {
@@ -98,7 +131,10 @@ export default function SearchBar({ value, onChange, onSearch, options = { origi
   const handleSubmit = (e) => {
     e.preventDefault();
     if (isInvalid) return;
-    onSearch(trimmed);
+    const searchData = tripType === "return"
+      ? { from: trimmed.from, to: trimmed.to, date: trimmed.date, returnDate: trimmed.returnDate }
+      : { from: trimmed.from, to: trimmed.to, date: trimmed.date };
+    onSearch(searchData);
   };
 
   const handleFieldChange = (field) => (e) => {
@@ -107,19 +143,34 @@ export default function SearchBar({ value, onChange, onSearch, options = { origi
 
   return (
     <Card onSubmit={handleSubmit} noValidate>
+      {/* ✅ Trip type toggle */}
+      <ToggleRow>
+        <ToggleButton
+          type="button"
+          active={tripType === "oneway"}
+          onClick={() => setTripType("oneway")}
+        >
+          One-way
+        </ToggleButton>
+        <ToggleButton
+          type="button"
+          active={tripType === "return"}
+          onClick={() => setTripType("return")}
+        >
+          Return
+        </ToggleButton>
+      </ToggleRow>
+
+      {/* From / To / Date (+Return date) */}
       <Row>
-        <Field htmlFor="from">
+        <Field>
           <Label>From</Label>
           <Select
-            id="from"
-            name="from"
             value={from}
             onChange={handleFieldChange("from")}
             disabled={isLoadingOptions || origins.length === 0}
           >
-            <option value="">
-              Select departure
-            </option>
+            <option value="">Select departure</option>
             {origins.map((origin) => (
               <option key={origin} value={origin}>
                 {origin}
@@ -128,18 +179,14 @@ export default function SearchBar({ value, onChange, onSearch, options = { origi
           </Select>
         </Field>
 
-        <Field htmlFor="to">
+        <Field>
           <Label>To</Label>
           <Select
-            id="to"
-            name="to"
             value={to}
             onChange={handleFieldChange("to")}
             disabled={isLoadingOptions || destinations.length === 0}
           >
-            <option value="">
-              Select destination
-            </option>
+            <option value="">Select destination</option>
             {destinations.map((destination) => (
               <option key={destination} value={destination}>
                 {destination}
@@ -148,26 +195,32 @@ export default function SearchBar({ value, onChange, onSearch, options = { origi
           </Select>
         </Field>
 
-        <Field htmlFor="date">
+        <Field>
           <Label>Date</Label>
           <Input
-            id="date"
             type="date"
-            name="date"
-            value={date}
+            value={departDate}
             onChange={handleFieldChange("date")}
           />
         </Field>
+
+        {/* ✅ Return Date (แสดงเฉพาะตอนเลือก Return) */}
+        {tripType === "return" && (
+          <Field>
+            <Label>Return Date</Label>
+            <Input
+              type="date"
+              value={returnDate}
+              onChange={handleFieldChange("returnDate")}
+            />
+          </Field>
+        )}
       </Row>
 
       <Actions>
-        <SearchButton
-          type="submit"
-          disabled={isInvalid || isLoadingOptions}
-        >
+        <SearchButton type="submit" disabled={isInvalid || isLoadingOptions}>
           Search
         </SearchButton>
-
         {isInvalid && validationMessage && (
           <Validation>{validationMessage}</Validation>
         )}
@@ -181,6 +234,7 @@ SearchBar.propTypes = {
     from: PropTypes.string.isRequired,
     to: PropTypes.string.isRequired,
     date: PropTypes.string.isRequired,
+    returnDate: PropTypes.string, // ✅ เพิ่ม return date
   }).isRequired,
   onChange: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,

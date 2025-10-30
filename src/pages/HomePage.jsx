@@ -4,6 +4,8 @@ import styled from "styled-components";
 import SearchBar from "../component/search/SearchBar";
 import { getFlights } from "../services/api";
 
+
+
 const Container = styled.main`
   max-width: 720px;
   margin: 48px auto;
