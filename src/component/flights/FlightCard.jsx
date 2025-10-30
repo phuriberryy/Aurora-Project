@@ -3,7 +3,7 @@ import styled from "styled-components";
 import Button from "../ui/Button";
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { startBooking } from '../../features/booking/bookingSlice';
+import { startBooking } from '../../component/booking/bookingSlice';
 
 const Card = styled.div`
   display: flex;
@@ -45,8 +45,8 @@ const FlightCard = ({ flight }) => {
       id: String(flight.id),
       carrier: flight.carrier || "Aurora",
       flightNo: flight.flightNo || ("AX-" + flight.id),
-      depart: flight.depart || flight.departTime,
-      arrive: flight.arrive || flight.arriveTime,
+      departTime: flight.departTime || flight.depart,
+      arriveTime: flight.arriveTime || flight.arrive,
       price: Number(flight.price) || 0,
     };
     dispatch(startBooking(mapped));
@@ -84,3 +84,5 @@ FlightCard.propTypes = {
 };
 
 export default FlightCard;
+
+

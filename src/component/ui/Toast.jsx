@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
-import { hideToast } from '../../features/ui/uiSlice'; 
+import { hideToast } from '../../component/booking/uiSlice'; 
 
 // --- Styled Components ---
 const ToastWrapper = styled.div`
@@ -14,14 +14,14 @@ const ToastWrapper = styled.div`
   font-weight: bold;
   z-index: 200;
   
-  /* (เปลี่ยนสีตาม 'type' ที่ Redux ส่งมา) */
+  /* (???????????? 'type' ??? Redux ?????) */
   background-color: ${({ theme, type }) => {
     if (type === 'success') return theme.colors.success;
     if (type === 'error') return theme.colors.danger;
     return theme.colors.secondary;
   }};
   
-  /* (Animation เลื่อนเข้า/ออก) */
+  /* (Animation ??????????/???) */
   animation: slideIn 0.3s ease-out;
 
   @keyframes slideIn {
@@ -61,3 +61,5 @@ export default function Toast() {
     </ToastWrapper>
   );
 }
+
+

@@ -7,7 +7,7 @@ import Layout from './component/ui/Layout';
 import HomePage from './pages/HomePage';
 import FlightsPage from './pages/FlightsPage';
 import FlightDetailPage from './pages/FlightDetailPage';
-import { BookingPage } from './features/booking';
+import BookingPage from './component/booking/BookingPage';
 import NotFound from './pages/NotFound';
 import MyBookingsPage from './pages/MyBookingsPage'; 
 
@@ -65,6 +65,7 @@ export const router = createBrowserRouter([
     element: <NotFound />, // แสดงหน้า 404
   },
 ]);
+
 
 
 
