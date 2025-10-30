@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 
 // 1. Import Redux Actions (เพื่อทดสอบ Modal/Toast)
-import { openModal, showToast } from '../component/booking/uiSlice';
+import { openModal, showToast } from '../features/ui/uiSlice';
 
 // 2. Import UI Kit (ที่เราสร้างไว้)
 import Button from '../component/ui/Button';

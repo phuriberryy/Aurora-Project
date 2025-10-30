@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
-import { hideToast } from '../../component/booking/uiSlice'; 
+import { hideToast } from '../../features/ui/uiSlice'; 
 
 // --- Styled Components ---
 const ToastWrapper = styled.div`

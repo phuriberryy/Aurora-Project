@@ -130,6 +130,19 @@ export default function BookingForm() {
   const booking = useSelector(selectBooking);
 
   const formValid = useMemo(() => Boolean(booking.flight), [booking.flight]);
+  const fmtDateTime = (raw) => {
+    if (!raw) return '-';
+    const d = new Date(raw);
+    if (!Number.isNaN(d.valueOf())) return d.toLocaleString();
+    const dateBase = booking.flight?.date;
+    if (dateBase && /^\d{2}:\d{2}/.test(String(raw))) {
+      const t = String(raw).slice(0,5);
+      const composed = `${dateBase}T${t}:00`;
+      const d2 = new Date(composed);
+      if (!Number.isNaN(d2.valueOf())) return d2.toLocaleString();
+    }
+    return String(raw);
+  };
   useEffect(() => {
     const id = booking?.flight?.id;
     if (!id) return;
@@ -139,7 +152,13 @@ export default function BookingForm() {
         const f = res?.data || {};
         dispatch(updateFlight({
           departTime: f.departTime || f.depart,
-          arriveTime: f.arriveTime || f.arrive, price: Number(f.price) || booking.price.base, carrier: (f.carrier || booking.flight.carrier), flightNo: (f.flightNo || booking.flight.flightNo)
+          arriveTime: f.arriveTime || f.arrive,
+          date: f.date || booking.flight.date,
+          from: f.from || booking.flight.from,
+          to: f.to || booking.flight.to,
+          price: Number(f.price) || booking.price.base,
+          carrier: f.carrier || booking.flight.carrier,
+          flightNo: f.code || f.flightNo || booking.flight.flightNo
         }));
       }).catch(() => {});
     }
@@ -165,9 +184,9 @@ export default function BookingForm() {
 
             <div><strong>{booking.flight.carrier} {booking.flight.flightNo}</strong></div>
 
-            <div>Depart: {new Date(booking.flight.departTime).toLocaleString()}</div>
+            <div>Depart: {fmtDateTime(booking.flight.departTime)}</div>
 
-            <div>Arrive: {new Date(booking.flight.arriveTime).toLocaleString()}</div>
+            <div>Arrive: {fmtDateTime(booking.flight.arriveTime)}</div>
 
             <div>Fare: {booking.price.currency} {booking.price.base}</div>
 
@@ -312,6 +331,8 @@ export default function BookingForm() {
   );
 
 }
+
+
 
 
 

@@ -37,17 +37,18 @@ const Price = styled.div`
   color: #0077cc;
 `;
 
-const FlightCard = ({ flight }) => {
+const FlightCard = ({ flight, date }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const handleSelect = () => {
     const mapped = {
       id: String(flight.id),
       carrier: flight.carrier || "Aurora",
-      flightNo: flight.flightNo || ("AX-" + flight.id),
+      flightNo: flight.flightNo || flight.code || ("AX-" + flight.id),
       departTime: flight.departTime || flight.depart,
       arriveTime: flight.arriveTime || flight.arrive,
       price: Number(flight.price) || 0,
+      date: date || flight.date,
     };
     dispatch(startBooking(mapped));
     navigate("/booking");
@@ -84,5 +85,6 @@ FlightCard.propTypes = {
 };
 
 export default FlightCard;
+
 
 

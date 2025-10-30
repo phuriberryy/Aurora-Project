@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 // 1. Import reducer ของคุณ (D)
-import uiReducer from './component/booking/uiSlice';
+import uiReducer from './features/ui/uiSlice';
 
 // 2. Import reducers อื่นๆ ที่นี่ (ของ A, B, C)
 // (เราจะมาเพิ่มทีหลังตอนเพื่อนๆ ทำเสร็จ)
