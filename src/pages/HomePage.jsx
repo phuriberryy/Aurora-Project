@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from 'react-redux';
 import styled from "styled-components";
 import SearchBar from "../component/search/SearchBar";
 import { getFlights } from "../services/api";
+import { demoStartBooking } from '../features/booking/dev.mock';
 
 
 
@@ -27,8 +29,8 @@ const ErrorMessage = styled.p`
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  // state ข้อมูลฟอร์มค้นหา
   const [query, setQuery] = useState({
     from: "",
     to: "",
@@ -79,12 +81,10 @@ export default function HomePage() {
     };
   }, []);
 
-  // อัปเดตค่าฟอร์มหลัก
   const handleQueryChange = (partial) => {
     setQuery((prev) => ({ ...prev, ...partial }));
   };
 
-  // กด Search แล้วไปหน้า Flights พร้อม query string
   const handleSearch = ({ from, to, date }) => {
     const params = new URLSearchParams({
       from,
@@ -106,6 +106,15 @@ export default function HomePage() {
         isLoadingOptions={isLoadingOptions}
       />
       {optionsError && <ErrorMessage>{optionsError}</ErrorMessage>}
+
+      <div style={{ marginTop: 16 }}>
+        <button
+          onClick={() => { demoStartBooking(dispatch); navigate('/booking'); }}
+          style={{ padding: '10px 14px', borderRadius: 8, border: 0, background: '#6ea8fe', color: '#0b1220', fontWeight: 700, cursor: 'pointer' }}
+        >
+          Quick Book (Demo)
+        </button>
+      </div>
     </Container>
   );
 }
