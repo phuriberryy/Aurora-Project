@@ -37,7 +37,7 @@ npm start
 
 👩‍💻 โครงสร้างทีม (Owners)
 
-A (Search/Discovery): HomePage, SearchBar, Filters, searchSlice
+A (Search/Discovery): HomePage, SearchBar, searchSlice
 
 B (Flights Results/Detail): FlightsPage, FlightList, FlightCard, flightsSlice
 
