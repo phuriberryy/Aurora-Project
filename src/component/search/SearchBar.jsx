@@ -242,3 +242,4 @@ SearchBar.propTypes = {
   }),
   isLoadingOptions: PropTypes.bool,
 };
+
