@@ -1,13 +1,13 @@
-import PropTypes from "prop-types";
+﻿import PropTypes from "prop-types";
 import FlightCard from "./FlightCard";
 
-const FlightList = ({ flights }) => {
+const FlightList = ({ flights, date }) => {
     return (
         <div>
             {flights.length === 0 ? (
                 <p>No flights available.</p>
             ) : (
-                flights.map((flight) => <FlightCard key={flight.id} flight={flight} />)
+                flights.map((flight) => <FlightCard key={flight.id} flight={flight} date={date} />)
             )}
         </div>
     );
@@ -27,3 +27,4 @@ FlightList.propTypes = {
 };
 
 export default FlightList;
+
