@@ -6,7 +6,7 @@ import Button from '../component/ui/Button';
 import Input from '../component/ui/Input';
 
 import { useDispatch } from 'react-redux';
-import { showToast } from '../features/ui/uiSlice';
+import { showToast } from '../component/booking/uiSlice';
 
 // --- 3. เชื่อมต่อ API ---
 import { registerUser, loginUser } from '../services/api';

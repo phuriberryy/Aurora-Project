@@ -91,6 +91,7 @@ const bookingSlice = createSlice({
   name: 'booking',
   initialState,
   reducers: {
+    updateFlight(state, action) { state.flight = { ...(state.flight||{}), ...(action.payload||{}) }; recomputePrice(state); },
     startBooking: {
       reducer(state, action) {
         const { flight } = action.payload;
@@ -157,7 +158,7 @@ const bookingSlice = createSlice({
   }
 });
 
-export const {
+ export const {
   startBooking,
   addPassenger,
   removePassenger,
@@ -166,14 +167,19 @@ export const {
   updateExtras,
   goToSummary,
   backToForm,
-  resetBooking
+  resetBooking,
+  updateFlight
 } = bookingSlice.actions;
-
 export const selectBooking = (state) => state.booking;
 export const selectPrice = (state) => state.booking.price;
 export const selectStep = (state) => state.booking.step;
 
 export default bookingSlice.reducer;
+
+
+
+
+
 
 
 

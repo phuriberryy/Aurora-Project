@@ -8,7 +8,7 @@ import Input from '../component/ui/Input';
 
 // --- 2. เชื่อมต่อ Redux (สำหรับ Toast) ---
 import { useDispatch } from 'react-redux';
-import { showToast } from '../features/ui/uiSlice';
+import { showToast } from '../component/booking/uiSlice';
 
 // --- 3. เชื่อมต่อ API ---
 // (เราจะใช้ loginUser ที่มาจาก api.js ซึ่งเชื่อมกับ http.js ที่ถูกต้อง)
