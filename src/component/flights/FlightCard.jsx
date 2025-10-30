@@ -43,8 +43,7 @@ const FlightCard = ({ flight, date }) => {
   const handleSelect = () => {
     const mapped = {
       id: String(flight.id),
-      carrier: flight.carrier || "Aurora",
-      flightNo: flight.flightNo || flight.code || ("AX-" + flight.id),
+      flightNo: flight.code,
       departTime: flight.departTime || flight.depart,
       arriveTime: flight.arriveTime || flight.arrive,
       price: Number(flight.price) || 0,
