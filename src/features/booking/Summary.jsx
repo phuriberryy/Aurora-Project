@@ -58,7 +58,7 @@ export default function Summary(){
         <h4>Contact</h4>
         <p>{booking.contact.email}  |  {booking.contact.phone}</p>
         <h4>Extras</h4>
-        <p>{booking.extras.baggageKg} kg baggage  |  Seat: {booking.extras.seatPref}</p>
+        <p>{booking.extras.baggageKg} kg baggage  |  Seats: {(booking.extras.seats && booking.extras.seats.length>0) ? booking.extras.seats.join(', ') : booking.extras.seatPref}</p>
         <h4>Total</h4>
         <p><strong>{booking.price.currency} {booking.price.total}</strong></p>
         {booking.status === 'failed' && (
@@ -74,5 +74,6 @@ export default function Summary(){
     </div>
   );
 }
+
 
 

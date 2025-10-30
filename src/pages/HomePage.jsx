@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from 'react-redux';
 import styled from "styled-components";
 import SearchBar from "../component/search/SearchBar";
 import { getFlights } from "../services/api";
-import { demoStartBooking } from '../features/booking/dev.mock';
 
 
 
@@ -29,7 +27,6 @@ const ErrorMessage = styled.p`
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const [query, setQuery] = useState({
     from: "",
@@ -105,16 +102,7 @@ export default function HomePage() {
         options={searchOptions}
         isLoadingOptions={isLoadingOptions}
       />
-      {optionsError && <ErrorMessage>{optionsError}</ErrorMessage>}
-
-      <div style={{ marginTop: 16 }}>
-        <button
-          onClick={() => { demoStartBooking(dispatch); navigate('/booking'); }}
-          style={{ padding: '10px 14px', borderRadius: 8, border: 0, background: '#6ea8fe', color: '#0b1220', fontWeight: 700, cursor: 'pointer' }}
-        >
-          Quick Book (Demo)
-        </button>
-      </div>
-    </Container>
+      {optionsError && <ErrorMessage>{optionsError}</ErrorMessage>}    </Container>
   );
 }
+

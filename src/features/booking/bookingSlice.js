@@ -68,7 +68,7 @@ export const submitBooking = createAsyncThunk(
     // {id, firstName, lastName, gender, dob, type:'ADT'|'CHD'|'INF'}
   ],
   contact: { email: '', phone: '' },
-  extras: { baggageKg: 0, seatPref: 'AUTO' },
+  extras: { baggageKg: 0, seatPref: 'AUTO', seats: [] },
   price: { base: 0, taxes: 0, extras: 0, total: 0, currency: 'THB' },
   step: 1, // 1: form, 2: summary, 3: confirmation
   status: 'idle', // idle|loading|succeeded|failed
@@ -102,7 +102,7 @@ const bookingSlice = createSlice({
         state.confirmation = null;
         state.passengers = [{ id: nanoid(), firstName: '', lastName: '', gender: 'UNSPEC', dob: '', type: 'ADT' }];
         state.contact = { email: '', phone: '' };
-        state.extras = { baggageKg: 0, seatPref: 'AUTO' };
+        state.extras = { baggageKg: 0, seatPref: 'AUTO', seats: [] };
         recomputePrice(state);
       },
       prepare(flight) {
@@ -174,6 +174,9 @@ export const selectPrice = (state) => state.booking.price;
 export const selectStep = (state) => state.booking.step;
 
 export default bookingSlice.reducer;
+
+
+
 
 
 
