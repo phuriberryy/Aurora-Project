@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { addPassenger, removePassenger, updatePassenger, updateContact, updateExtras, selectBooking, goToSummary } from './bookingSlice';
-import SeatPicker from './SeatPicker';
+import MultiSeatPicker from './MultiSeatPicker';
 
 const Card = styled.section`
   padding: 16px;
@@ -132,7 +132,7 @@ export default function BookingForm() {
             Auto-assign
           </button>
         </div>
-        <SeatPicker value={booking.extras.seatPref} onChange={(code)=>dispatch(updateExtras({ seatPref: code }))} />
+        <MultiSeatPicker capacity={booking.passengers.length} value={booking.extras.seats || []} onChange={(arr)=>dispatch(updateExtras({ seats: arr, seatPref: (arr && arr.length>0) ? arr[0] : 'AUTO' }))} />
 
         <SubTitle>Price</SubTitle>
         <Row>
@@ -149,6 +149,7 @@ export default function BookingForm() {
     </div>
   );
 }
+
 
 
 

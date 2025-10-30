@@ -1,6 +1,9 @@
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import Button from "../ui/Button";
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { startBooking } from '../../features/booking/bookingSlice';
 
 const Card = styled.div`
   display: flex;
@@ -35,28 +38,40 @@ const Price = styled.div`
 `;
 
 const FlightCard = ({ flight }) => {
-    return (
-        <Card>
-            <Left>
-                <div>
-                    <h2>{flight.from} &rarr; {flight.to}</h2>
-                </div>
-                <div>
-                    Departure: {flight.departTime}
-                </div>
-                <div>
-                    Arrival: {flight.arriveTime}
-                </div>
-            </Left>
-            <Right>
-            <Price>${flight.price}</Price>
-            <Button>Select</Button>
-            </Right>
-            
-        </Card>
-    );
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const handleSelect = () => {
+    const mapped = {
+      id: String(flight.id),
+      carrier: flight.carrier || "Aurora",
+      flightNo: flight.flightNo || ("AX-" + flight.id),
+      depart: flight.depart || flight.departTime,
+      arrive: flight.arrive || flight.arriveTime,
+      price: Number(flight.price) || 0,
+    };
+    dispatch(startBooking(mapped));
+    navigate("/booking");
+  };
+  return (
+    <Card>
+      <Left>
+        <div>
+          <h2>{flight.from} &rarr; {flight.to}</h2>
+        </div>
+        <div>
+          Departure: {flight.departTime}
+        </div>
+        <div>
+          Arrival: {flight.arriveTime}
+        </div>
+      </Left>
+      <Right>
+        <Price>${flight.price}</Price>
+        <Button onClick={handleSelect}>Select</Button>
+      </Right>
+    </Card>
+  );
 };
-
 FlightCard.propTypes = {
     flight: PropTypes.shape({
         id: PropTypes.string.isRequired,
