@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import styled from "styled-components";
+import Button from "../ui/Button";
 
 const Card = styled.div`
   display: flex;
@@ -11,7 +12,6 @@ const Card = styled.div`
   border-radius: 20px;
   background: #fff;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
 `;
 
 const Left = styled.div`
@@ -19,10 +19,18 @@ const Left = styled.div`
   gap: 4px;
 `;
 
+const Right = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 8px; 
+`;
+
 const Price = styled.div`
+  text-align: center;
   font-weight: 700;
   min-width: 90px;
-  text-align: right;
   color: #0077cc;
 `;
 
@@ -40,7 +48,11 @@ const FlightCard = ({ flight }) => {
                     Arrival: {flight.arriveTime}
                 </div>
             </Left>
+            <Right>
             <Price>${flight.price}</Price>
+            <Button>Select</Button>
+            </Right>
+            
         </Card>
     );
 };
