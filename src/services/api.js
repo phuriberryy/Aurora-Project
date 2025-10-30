@@ -29,10 +29,7 @@ export const registerUser = (userData) => {
 };
 
 export const loginUser = (email) => {
-  // GET /user?email={email} -> ค้นหา user จาก email
-  // MockAPI.io อาจไม่ได้กรองข้อมูลตาม query params ได้อย่างสมบูรณ์
-  // ดังนั้น เราจะทำการกรองข้อมูลฝั่ง client-side อีกครั้งเพื่อความถูกต้อง
-  return http.get('/users', { params: { email } }).then(response => {
+  return http.get('/users').then(response => {
     const filteredUsers = Array.isArray(response.data)
       ? response.data.filter(user => user.email === email)
       : [];
