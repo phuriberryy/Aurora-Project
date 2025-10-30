@@ -5,7 +5,6 @@ import SearchBar from "../component/search/SearchBar";
 import { getFlights } from "../services/api";
 
 
-
 const Container = styled.main`
   max-width: 720px;
   margin: 48px auto;
@@ -102,7 +101,7 @@ export default function HomePage() {
         options={searchOptions}
         isLoadingOptions={isLoadingOptions}
       />
-      {optionsError && <ErrorMessage>{optionsError}</ErrorMessage>}    </Container>
+      {optionsError && <ErrorMessage>{optionsError}</ErrorMessage>} </Container>
   );
 }
 

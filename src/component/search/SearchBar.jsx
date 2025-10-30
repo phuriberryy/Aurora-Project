@@ -23,7 +23,9 @@ const ToggleRow = styled.div`
   gap: 12px;
 `;
 
-const ToggleButton = styled.button`
+const ToggleButton = styled.button.withConfig({
+  shouldForwardProp: (prop) => prop !== "active"
+})`
   padding: 8px 20px;
   border-radius: 20px;
   border: 1px solid ${({ active }) => (active ? "#0077cc" : "#ccc")};
@@ -32,6 +34,7 @@ const ToggleButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+
   &:hover {
     background: ${({ active }) => (active ? "#006bb3" : "#eaeaea")};
   }
@@ -84,7 +87,7 @@ export default function SearchBar({
   options = { origins: [], destinations: [] },
   isLoadingOptions = false,
 }) {
-  const [tripType, setTripType] = useState("oneway"); // ✅ one-way / return
+  const [tripType, setTripType] = useState("oneway");
 
   const from = value.from ?? "";
   const to = value.to ?? "";
@@ -118,11 +121,7 @@ export default function SearchBar({
   const isInvalid = hasEmpty || sameRoute || pastDate;
 
   let validationMessage = "";
-  if (hasEmpty) {
-    validationMessage = tripType === "return"
-      ? "Please select all fields including return date."
-      : "Please select departure, destination, and date.";
-  } else if (sameRoute) {
+  if (sameRoute) {
     validationMessage = "Departure and destination must be different.";
   } else if (pastDate) {
     validationMessage = "Date cannot be in the past.";
@@ -131,9 +130,10 @@ export default function SearchBar({
   const handleSubmit = (e) => {
     e.preventDefault();
     if (isInvalid) return;
-    const searchData = tripType === "return"
-      ? { from: trimmed.from, to: trimmed.to, date: trimmed.date, returnDate: trimmed.returnDate }
-      : { from: trimmed.from, to: trimmed.to, date: trimmed.date };
+    const searchData =
+      tripType === "return"
+        ? { from: trimmed.from, to: trimmed.to, date: trimmed.date, returnDate: trimmed.returnDate }
+        : { from: trimmed.from, to: trimmed.to, date: trimmed.date };
     onSearch(searchData);
   };
 
@@ -143,7 +143,7 @@ export default function SearchBar({
 
   return (
     <Card onSubmit={handleSubmit} noValidate>
-      {/* ✅ Trip type toggle */}
+      {/* Trip type toggle */}
       <ToggleRow>
         <ToggleButton
           type="button"
@@ -204,7 +204,7 @@ export default function SearchBar({
           />
         </Field>
 
-        {/* ✅ Return Date (แสดงเฉพาะตอนเลือก Return) */}
+        {/* Return Date */}
         {tripType === "return" && (
           <Field>
             <Label>Return Date</Label>
@@ -221,9 +221,7 @@ export default function SearchBar({
         <SearchButton type="submit" disabled={isInvalid || isLoadingOptions}>
           Search
         </SearchButton>
-        {isInvalid && validationMessage && (
-          <Validation>{validationMessage}</Validation>
-        )}
+        {validationMessage && <Validation>{validationMessage}</Validation>}
       </Actions>
     </Card>
   );
@@ -234,7 +232,7 @@ SearchBar.propTypes = {
     from: PropTypes.string.isRequired,
     to: PropTypes.string.isRequired,
     date: PropTypes.string.isRequired,
-    returnDate: PropTypes.string, // ✅ เพิ่ม return date
+    returnDate: PropTypes.string,
   }).isRequired,
   onChange: PropTypes.func.isRequired,
   onSearch: PropTypes.func.isRequired,
