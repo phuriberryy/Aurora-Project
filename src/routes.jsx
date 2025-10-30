@@ -7,8 +7,9 @@ import Layout from './component/ui/Layout';
 import HomePage from './pages/HomePage';
 import FlightsPage from './pages/FlightsPage';
 import FlightDetailPage from './pages/FlightDetailPage';
-import BookingPage from './pages/BookingPage';
-import NotFound from './pages/NotFound'; 
+import { BookingPage } from './features/booking';
+import NotFound from './pages/NotFound';
+import MyBookingsPage from './pages/MyBookingsPage'; 
 
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
@@ -29,8 +30,12 @@ export const router = createBrowserRouter([
         element: <FlightsPage />,
       },
       {
-        path: 'flights/:id', // :id คือการรับ parameter (B)
+        path: 'flights/:id', // :id parameter (B)
         element: <FlightDetailPage />,
+      },
+      {
+        path: 'booking',
+        element: <BookingPage />,
       },
       {
         path: 'booking/:id', // :id คือการรับ parameter (C)
@@ -38,7 +43,7 @@ export const router = createBrowserRouter([
       },
       {
       path: 'my-bookings',
-        element: <NotFound />, // (ชี้ไปที่ NotFound ก่อนชั่วคราว)
+        element: <MyBookingsPage />, // (ชี้ไปที่ NotFound ก่อนชั่วคราว)
         // element: <MyBookingsPage />, // (ถ้ามีหน้าจริงแล้ว)
       },
       {
@@ -60,4 +65,8 @@ export const router = createBrowserRouter([
     element: <NotFound />, // แสดงหน้า 404
   },
 ]);
+
+
+
+
 

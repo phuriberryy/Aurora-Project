@@ -7,7 +7,7 @@ import uiReducer from './features/ui/uiSlice';
 // (เราจะมาเพิ่มทีหลังตอนเพื่อนๆ ทำเสร็จ)
 // import searchReducer from './features/search/searchSlice';
 // import flightsReducer from './features/flights/flightsSlice';
-// import bookingReducer from './features/booking/bookingSlice';
+import bookingReducer from './features/booking/bookingSlice';
 
 export const store = configureStore({
   reducer: {
@@ -15,7 +15,8 @@ export const store = configureStore({
     ui: uiReducer,
     // search: searchReducer,
     // flights: flightsReducer,
-    // booking: bookingReducer,
+    booking: bookingReducer,
   },
 });
+
 
