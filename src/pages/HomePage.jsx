@@ -6,6 +6,8 @@ import SearchBar from "../component/search/SearchBar";
 import { getFlights } from "../services/api";
 import { demoStartBooking } from '../features/booking/dev.mock';
 
+
+
 const Container = styled.main`
   max-width: 720px;
   margin: 48px auto;
