@@ -16,10 +16,7 @@ export const cancelBooking = (bookingId) => {
   return http.delete(`/bookings/${bookingId}`);
 };
 
-export async function getAirports() {
-  const res = await http.get("/airport");
-  return res.data; 
-}
+
 
 // --- User Authentication API ---
 
