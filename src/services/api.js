@@ -1,4 +1,5 @@
 import http from './http';
+import { httpBK } from './http';
 
 export const getFlights = (params) => {
   return http.get('/flights', { params });
@@ -9,11 +10,11 @@ export const getFlight = (id) => {
 };
 
 export const createBooking = (bookingData) => {
-  return http.post('/bookings', bookingData);
+  return httpBK.post('/bookings', bookingData);
 };
 
 export const cancelBooking = (bookingId) => {
-  return http.delete(`/bookings/${bookingId}`);
+  return httpBK.delete(`/bookings/${bookingId}`);
 };
 
 

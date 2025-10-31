@@ -10,7 +10,7 @@ import { createSlice, createAsyncThunk, nanoid } from '@reduxjs/toolkit';
 // อ่านค่าคอนฟิกจาก .env (มี default เผื่อกรณีไม่ตั้งค่า)
 // ===========================
 const API_BASE = process.env.REACT_APP_API_BASE_URL || '';
-const BOOKINGS_PATH = process.env.REACT_APP_BOOKINGS_PATH || '/bookings';
+const BOOKINGS_PATH = process.env.REACT_API_BOOKINGS_URL || '/bookings';
 const FAKE_CONFIRM = String(process.env.REACT_APP_FAKE_CONFIRM_ON_ERROR).toLowerCase() === 'true';
 const SEAT_RESERVE_PATH = process.env.REACT_APP_SEAT_RESERVE_PATH || '/seat-reservations';
 
