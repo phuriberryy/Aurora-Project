@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";                       
 import { useNavigate } from "react-router-dom";                    
 import SearchBar from "../component/search/SearchBar";        
-import { getFlights } from "../services/api";                     
+import { getFlights } from "../services/api";    
+
+
+
 
 function HomePage() {                              
   const navigate = useNavigate();                                  // พาไปหน้าอื่น
 
   // เก็บค่าที่ผู้ใช้กรอกในฟอร์ม
-  const [query, setQuery] = useState({ from: "", to: "", date: "" });
+  const [query, setQuery] = useState({ from: "", to: "", date: "", returnDate: "" });
 
   // เก็บรายชื่อสนามบินทั้งหมด (dropdown) ต้นทางปลายทาง 
   const [options, setOptions] = useState({ origins: [], destinations: [] });
@@ -52,8 +55,10 @@ function HomePage() {
   }
 
   // เวลา user กด Search — SearchBar จะส่งค่า (from, to, date)
-  function handleSearch({ from, to, date }) {
-    const params = new URLSearchParams({ from, to, date }).toString(); // สร้าง query string เช่น "from=BKK&to=CNX&date=2025-11-01"
+  function handleSearch({ from, to, date, returnDate }) {
+    const paramsObj = { from, to, date };
+    if (returnDate) paramsObj.returnDate = returnDate;
+    const params = new URLSearchParams(paramsObj).toString(); // สร้าง query string เช่น "from=BKK&to=CNX&date=2025-11-01"
     navigate(`/flights?${params}`);                                  
   }
 
