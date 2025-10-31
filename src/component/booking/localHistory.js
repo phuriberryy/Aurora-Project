@@ -4,6 +4,7 @@
 import seedHistory from './booking-history.json';
 
 const KEY = 'aurora_booking_history';
+const DRAFT_KEY = 'aurora_booking_draft';
 
 const safeGet = () => {
   try {
@@ -107,13 +108,31 @@ export const clearHistory = () => safeSet([]);
 export const exportHistoryToFile = () => {};
 export const importHistoryFromObject = (arr) => { if (Array.isArray(arr)) safeSet(arr); };
 
-// Force clear now (one-off request). This runs on next app load and clears
-// stored booking history immediately without needing UI interaction.
-try {
-  // Only if running in a browser environment
-  if (typeof window !== 'undefined' && window.localStorage) {
-    safeSet([]);
+// --- Draft (persist current booking state across refresh) ---
+export const saveDraft = (draft) => {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    window.localStorage.setItem(DRAFT_KEY, JSON.stringify(draft || {}));
+  } catch (_) {}
+};
+
+export const loadDraft = () => {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return null;
+    const raw = window.localStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    if (obj && typeof obj === 'object') return obj;
+    return null;
+  } catch (_) {
+    return null;
   }
-} catch (_) {
-  // ignore
-}
+};
+
+export const clearDraft = () => {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    window.localStorage.removeItem(DRAFT_KEY);
+  } catch (_) {}
+};
+
