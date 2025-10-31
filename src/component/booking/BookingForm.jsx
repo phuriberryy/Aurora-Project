@@ -279,26 +279,11 @@ export default function BookingForm() {
         </Row>
 
         <SubTitle>Seat Selection</SubTitle>
-
-        <div style={{ marginBottom: 8 }}>
-
-          <button
-
-            type="button"
-
-            onClick={()=>dispatch(updateExtras({ seatPref: 'AUTO' }))}
-
-            style={{ padding:'6px 10px', border:'1px solid rgba(0,0,0,0.12)', borderRadius:8, background:'#fff', cursor:'pointer' }}
-
-          >
-
-            Auto-assign
-
-          </button>
-
-        </div>
-
-        <MultiSeatPicker capacity={booking.passengers.length} value={booking.extras.seats || []} onChange={(arr)=>dispatch(updateExtras({ seats: arr, seatPref: (arr && arr.length>0) ? arr[0] : 'AUTO' }))} />
+        <MultiSeatPicker
+          capacity={booking.passengers.length}
+          value={booking.extras.seats || []}
+          onChange={(arr)=>dispatch(updateExtras({ seats: arr, seatPref: (arr && arr.length>0) ? arr[0] : 'AUTO' }))}
+        />
 
 
 

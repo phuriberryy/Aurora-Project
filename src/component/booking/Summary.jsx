@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
-import { backToForm, selectBooking, submitBooking } from './bookingSlice';
+import { backToForm, selectBooking, submitBooking, updateFlight } from './bookingSlice';
+import { getFlight } from '../../services/api';
 
 const Card = styled.div`
   padding: 16px;
@@ -30,6 +31,43 @@ export default function Summary(){
   const dispatch = useDispatch();
   const booking = useSelector(selectBooking);
 
+  const fmtDateTime = (raw) => {
+    if (!raw) return '-';
+    const d = new Date(raw);
+    if (!Number.isNaN(d.valueOf())) return d.toLocaleString();
+    const dateBase = booking.flight?.date;
+    if (dateBase && /^\d{2}:\d{2}/.test(String(raw))) {
+      const t = String(raw).slice(0,5);
+      const composed = `${dateBase}T${t}:00`;
+      const d2 = new Date(composed);
+      if (!Number.isNaN(d2.valueOf())) return d2.toLocaleString();
+    }
+    return String(raw);
+  };
+
+  useEffect(() => {
+    const id = booking?.flight?.id;
+    if (!id) return;
+    const needsFetch = !(booking.flight.departTime && booking.flight.arriveTime && booking.flight.date);
+    if (needsFetch) {
+      getFlight(id)
+        .then((res) => {
+          const f = res?.data || {};
+          dispatch(updateFlight({
+            departTime: f.departTime || f.depart,
+            arriveTime: f.arriveTime || f.arrive,
+            date: f.date || booking.flight.date,
+            from: f.from || booking.flight.from,
+            to: f.to || booking.flight.to,
+            price: Number(f.price) || booking.price.base,
+            carrier: f.carrier || booking.flight.carrier,
+            flightNo: f.code || f.flightNo || booking.flight.flightNo,
+          }));
+        })
+        .catch(() => {});
+    }
+  }, [booking?.flight?.id]);
+
   const handleConfirm = () => {
     const payload = {
       flightId: booking.flight.id,
@@ -46,8 +84,8 @@ export default function Summary(){
       <Card>
         <h3 style={{ color: '#0062E6', marginTop: 0 }}>Review your booking</h3>
         <p><strong>Flight:</strong> {booking.flight?.carrier} {booking.flight?.flightNo}</p>
-        <p><strong>Depart:</strong> {new Date(booking.flight?.depart).toLocaleString()}</p>
-        <p><strong>Arrive:</strong> {new Date(booking.flight?.arrive).toLocaleString()}</p>
+        <p><strong>Depart:</strong> {fmtDateTime(booking.flight?.departTime)}</p>
+        <p><strong>Arrive:</strong> {fmtDateTime(booking.flight?.arriveTime)}</p>
         <hr/>
         <h4>Passengers</h4>
         <ul>
