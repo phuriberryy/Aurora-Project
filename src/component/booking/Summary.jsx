@@ -1,9 +1,18 @@
+// ===========================
+// Imports
+// ===========================
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { useDispatch, useSelector } from 'react-redux';
 import { backToForm, selectBooking, submitBooking, updateFlight } from './bookingSlice';
 import { getFlight } from '../../services/api';
 
+
+// ===========================
+// Styled Components
+// ---------------------------
+// การ์ด/ปุ่ม/ปุ่มโปร่ง สำหรับใช้ในหน้า Summary
+// ===========================
 const Card = styled.div`
   padding: 16px;
   background: ${({ theme }) => theme.colors.white};
@@ -27,10 +36,25 @@ const Ghost = styled(Button)`
   border: 1px solid ${({ theme }) => theme.colors.primary};
 `;
 
+
+// ===========================
+// Component: Summary
+// ---------------------------
+// หน้าสรุปก่อนยืนยันการจอง แสดงข้อมูลเที่ยวบิน/ผู้โดยสาร/ติดต่อ/ค่าใช้จ่าย
+// และปุ่มยืนยันการจองหรือย้อนกลับไปแก้ไข
+// ===========================
 export default function Summary(){
   const dispatch = useDispatch();
   const booking = useSelector(selectBooking);
 
+  // ===========================
+  // Helper: fmtDateTime
+  // ---------------------------
+  // แปลงค่าเวลาหลากหลายรูปแบบให้แสดงอ่านง่าย
+  // 1) ถ้าเป็น Date parse ได้ -> ใช้ toLocaleString()
+  // 2) ถ้าเป็น "HH:mm" และมีวันที่ฐาน -> ประกอบเป็น datetime
+  // 3) กรณีอื่น -> คืนค่า string เดิม
+  // ===========================
   const fmtDateTime = (raw) => {
     if (!raw) return '-';
     const d = new Date(raw);
@@ -45,6 +69,12 @@ export default function Summary(){
     return String(raw);
   };
 
+  // ===========================
+  // Effect: เติมรายละเอียดเที่ยวบินให้ครบ
+  // ---------------------------
+  // เมื่อมี flight.id แต่ยังขาดเวลา/วันที่ ให้เรียก getFlight()
+  // แล้วอัปเดต state ด้วย updateFlight (best effort)
+  // ===========================
   useEffect(() => {
     const id = booking?.flight?.id;
     if (!id) return;
@@ -79,6 +109,11 @@ export default function Summary(){
     dispatch
   ]);
 
+  // ===========================
+  // Handler: handleConfirm
+  // ---------------------------
+  // สร้าง payload จากข้อมูลใน store แล้ว dispatch(submitBooking)
+  // ===========================
   const handleConfirm = () => {
     const payload = {
       flightId: booking.flight.id,
@@ -90,6 +125,14 @@ export default function Summary(){
     dispatch(submitBooking(payload));
   };
 
+  // ===========================
+  // Render
+  // ---------------------------
+  // โครงสร้าง:
+  // - การ์ดสรุปข้อมูลทั้งหมด
+  // - ปุ่มย้อนกลับไปแก้ไข / ปุ่มยืนยันการจอง
+  // - แสดง error เมื่อส่งจองล้มเหลว
+  // ===========================
   return (
     <div style={{display:'grid', gap:16}}>
       <Card>
@@ -114,6 +157,7 @@ export default function Summary(){
           <p style={{color:'#DC3545'}}>Error: {booking.error}</p>
         )}
       </Card>
+
       <div style={{display:'flex', gap:12, justifyContent:'flex-end'}}>
         <Ghost onClick={()=>dispatch(backToForm())}>&larr; Edit details</Ghost>
         <Button onClick={handleConfirm} disabled={booking.status==='loading'}>
@@ -123,6 +167,3 @@ export default function Summary(){
     </div>
   );
 }
-
-
-

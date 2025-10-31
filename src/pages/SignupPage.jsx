@@ -8,10 +8,9 @@ import Input from '../component/ui/Input';
 import { useDispatch } from 'react-redux';
 import { showToast } from '../features/ui/uiSlice';
 
-// --- 3. เชื่อมต่อ API ---
 import { registerUser, loginUser } from '../services/api';
 
-// --- Styled Components (can be refactored into a common file later) ---
+// --- Styled Components ---
 const SignupPageWrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -109,7 +108,7 @@ export default function SignupPage() {
       const newUser = {
         name: formData.name,
         email: formData.email,
-        password: formData.password, // ในระบบจริงควรมีการ hash รหัสผ่านก่อนส่ง
+        password: formData.password,
       };
       await registerUser(newUser);
       dispatch(showToast({ message: 'Signup successful! Welcome!', type: 'success' }));
@@ -120,7 +119,7 @@ export default function SignupPage() {
       console.error('Signup error:', error);
       dispatch(showToast({ message: 'Signup failed. Please try again.', type: 'error' }));
     } finally {
-      setLoading(false); // หยุด loading
+      setLoading(false);
     }
   };
 
@@ -130,7 +129,6 @@ export default function SignupPage() {
         <Title>Create Account</Title>
         <InputGroup>
           <Label htmlFor="name">Full Name</Label>
-          {/* 6. (เชื่อมต่อ UI Kit) - ใช้ <Input /> ที่ import มา */}
           <Input 
             type="text" 
             id="name" 
@@ -170,8 +168,6 @@ export default function SignupPage() {
           />
         </InputGroup>
         
-        {/* 7. (เชื่อมต่อ UI Kit) - ใช้ <Button /> ที่ import มา */}
-        {/* (เราเพิ่ม style prop เล็กน้อยเพื่อให้ปุ่มเต็มความกว้างเหมือนดีไซน์เดิม) */}
         <Button type="submit" style={{ width: '100%', padding: '0.9rem', fontSize: '1.1rem' }} disabled={loading}>
           Sign Up
         </Button>

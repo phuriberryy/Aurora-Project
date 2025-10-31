@@ -3,18 +3,17 @@ import ReactDOM from 'react-dom/client';
 
 // 1. Redux
 import { Provider } from 'react-redux';
-import { store } from './store'; // (ไฟล์ที่สร้างใน Step 3)
+import { store } from './store';
 
 // 2. Styled-components
 import { ThemeProvider } from 'styled-components';
-import { theme } from './theme'; // (ไฟล์ที่สร้างใน Step 4)
-import { GlobalStyle } from './GlobalStyle'; // (ไฟล์ที่สร้างใน Step 4)
+import { theme } from './theme'; 
+import { GlobalStyle } from './GlobalStyle'; 
 
 // 3. React Router
 import { RouterProvider } from 'react-router-dom';
-import { router } from './routes'; // (ไฟล์ที่คุณเพิ่งสร้างใน Step 6)
+import { router } from './routes';
 
-// (เราลบ import './index.css' และ './App.js' ออกไปแล้ว)
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

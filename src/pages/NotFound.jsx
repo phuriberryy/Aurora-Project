@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import Button from '../component/ui/Button'; // 1. Import UI Kit ของเรา
+import Button from '../component/ui/Button';
 
 // --- Styled Components ---
 const NotFoundWrapper = styled.div`
@@ -33,7 +33,6 @@ export default function NotFound() {
       <h1>404</h1>
       <p>Oops! The page you're looking for doesn't exist.</p>
       
-      {/* 2. ใช้ <Button> ที่เราสร้าง และหุ้มด้วย <Link> */}
       <Link to="/" style={{ textDecoration: 'none' }}>
         <Button>Go Back to Homepage</Button>
       </Link>
