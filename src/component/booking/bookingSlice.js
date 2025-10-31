@@ -114,7 +114,9 @@ const initialState = {
 // - total = base + taxes + extras
 // ===========================
 const recomputePrice = (state) => {
-  const base = Number(state?.flight?.price || 0);
+  const baseOutbound = Number(state?.flight?.price || 0);
+  const baseReturn = Number(state?.returnFlight?.price || 0);
+  const base = baseOutbound + baseReturn;
   const taxes = base > 0 ? Math.round(base * 0.07) : 0; // demo VAT 7%
   const extraBag = (state.extras.baggageKg || 0) * 35; // THB per kg demo
   const extras = extraBag;
@@ -159,6 +161,7 @@ const bookingSlice = createSlice({
     },
     updateReturnFlight(state, action) {
       state.returnFlight = { ...(state.returnFlight || {}), ...(action.payload || {}) };
+      recomputePrice(state);
     },
 
     // เพิ่มผู้โดยสารใหม่ (ค่าเริ่มต้นเป็น ADT)

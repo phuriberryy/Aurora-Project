@@ -65,6 +65,18 @@ export default function MyBookingsPage() {
             <p>Seat(s): {booking?.extras?.seats && booking.extras.seats.length > 0 ? booking.extras.seats.join(', ') : (booking?.extras?.seatPref || 'AUTO')}</p>
             <p>Depart: {booking.flight ? fmtDT(booking.flight.departTime, booking.flight.date) : '-'}</p>
             <p>Arrive: {booking.flight ? fmtDT(booking.flight.arriveTime, booking.flight.date) : '-'}</p>
+            <p>Fare: {booking.flight ? `${booking?.price?.currency || 'THB'} ${booking.flight.price ?? '-'}` : '-'}</p>
+
+            {booking.returnFlight && (
+              <>
+                <hr/>
+                <h4>Return Flight</h4>
+                <p>Flight: <strong>{[booking.returnFlight.carrier, booking.returnFlight.flightNo].filter(Boolean).join(' ') || '-'}</strong></p>
+                <p>Depart: {fmtDT(booking.returnFlight.departTime, booking.returnFlight.date)}</p>
+                <p>Arrive: {fmtDT(booking.returnFlight.arriveTime, booking.returnFlight.date)}</p>
+                <p>Fare: {(booking?.price?.currency || 'THB')} {booking.returnFlight.price ?? '-'}</p>
+              </>
+            )}
           </>
         ) : (
           <>

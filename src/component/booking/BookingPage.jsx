@@ -51,7 +51,7 @@ export default function BookingPage(){
   const dispatch = useDispatch();
   const location = useLocation();
   const step = useSelector(selectStep);
-  const { confirmation, flight, passengers, extras } = useSelector(selectBooking);
+  const { confirmation, flight, returnFlight, passengers, extras, price } = useSelector(selectBooking);
 
   // Initialize booking from selected flight(s) passed via navigation state (outbound + optional inbound)
   useEffect(() => {
@@ -160,6 +160,18 @@ export default function BookingPage(){
               {/* เวลาเดินทาง */}
               <p>Depart: {flight ? fmtDT(flight.departTime, flight.date) : '-'}</p>
               <p>Arrive: {flight ? fmtDT(flight.arriveTime, flight.date) : '-'}</p>
+              <p>Fare: {flight ? `${(price?.currency || 'THB')} ${flight.price ?? '-'}` : '-'}</p>
+
+              {returnFlight && (
+                <>
+                  <div style={{ height: 8 }} />
+                  <p>Return Flight: <strong>{[returnFlight.carrier, returnFlight.flightNo].filter(Boolean).join(' ') || '-'}</strong></p>
+                  <p>Depart: {fmtDT(returnFlight.departTime, returnFlight.date)}</p>
+                  <p>Arrive: {fmtDT(returnFlight.arriveTime, returnFlight.date)}</p>
+                  <p>Fare: {(price?.currency || 'THB')} {returnFlight.price ?? '-'}</p>
+                </>
+              )}
+
             </>
           ) : (
             // กรณีไม่มีรายละเอียดเพิ่มเติม แสดงข้อความยืนยันอย่างย่อ
@@ -173,4 +185,5 @@ export default function BookingPage(){
     </Container>
   );
 }
+
 
