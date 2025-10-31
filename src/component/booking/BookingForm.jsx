@@ -13,13 +13,7 @@ const Card = styled.section`
   padding: 16px;
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.dark};
-<<<<<<< HEAD
   border-radius: 12px;
-=======
-
-  border-radius: 20px;
-
->>>>>>> b87d9cc314eadc36edfc6b44adbae2949b0d4c1f
   margin-bottom: 16px;
   border: 1px solid rgba(0,0,0,0.06);
   box-shadow: 0 6px 18px rgba(0,0,0,0.08);
