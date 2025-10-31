@@ -3,9 +3,6 @@ import { useNavigate } from "react-router-dom";
 import SearchBar from "../component/search/SearchBar";        
 import { getFlights } from "../services/api";    
 
-
-
-
 function HomePage() {                              
   const navigate = useNavigate();                                  // พาไปหน้าอื่น
 
