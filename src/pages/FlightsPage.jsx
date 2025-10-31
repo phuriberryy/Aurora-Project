@@ -3,6 +3,7 @@ import http from "../services/http";
 import FlightList from "../component/flights/FlightList";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import SortSelect from "../component/flights/SortSelect";
+import PlaneLoader from "../component/ui/PlaneLoader";
 
 const toMin = (hhmm) => {
     const [h, m] = hhmm.split(":").map(Number);
@@ -107,7 +108,7 @@ const FlightsPage = () => {
         }
     };
 
-    if (loading) return <p>Loading flights...</p>;
+    if (loading) return <PlaneLoader />;
     if (error) return <p>Error loading flights: {error}</p>;
 
     return (
