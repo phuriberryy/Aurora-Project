@@ -66,7 +66,7 @@ const IconLink = styled(Link)`
 export default function Navbar() {
   return (
     <NavWrapper>
-      <LogoLink to="/">Aurora Airways</LogoLink>
+      <LogoLink to="/home">Aurora Airways</LogoLink>
       
       <NavLinks>
         <StyledLink to="/my-bookings">My Bookings</StyledLink>
