@@ -263,6 +263,19 @@ export default function BookingForm() {
           <p style={{ color: errors.flight ? '#dc3545' : undefined }}>No flight selected. Return to Flights and choose one.</p>
         )}
 
+        {/* -------- Return Flight Section (if any) -------- */}
+        {booking.returnFlight && (
+          <>
+            <SubTitle>Return Flight</SubTitle>
+            <Row>
+              <div><strong>{booking.returnFlight.carrier} {booking.returnFlight.flightNo}</strong></div>
+              <div>Depart: {fmtDateTime(booking.returnFlight.departTime)}</div>
+              <div>Arrive: {fmtDateTime(booking.returnFlight.arriveTime)}</div>
+              <div>Fare: {booking.price.currency} {booking.returnFlight.price}</div>
+            </Row>
+          </>
+        )}
+
         {/* -------- Passengers Section -------- */}
         <SubTitle>Passengers</SubTitle>
         {booking.passengers.map((p) => (

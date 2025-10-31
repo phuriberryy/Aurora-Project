@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import BookingForm from './BookingForm';
 import Summary from './Summary';
-import { selectStep, selectBooking, startBooking, updateFlight } from './bookingSlice';
+import { selectStep, selectBooking, startBooking, updateFlight, updateReturnFlight } from './bookingSlice';
 
 
 // ===========================
@@ -53,26 +53,32 @@ export default function BookingPage(){
   const step = useSelector(selectStep);
   const { confirmation, flight, passengers, extras } = useSelector(selectBooking);
 
-  // Initialize booking from selected flight passed via navigation state
+  // Initialize booking from selected flight(s) passed via navigation state (outbound + optional inbound)
   useEffect(() => {
     const st = location?.state || {};
-    const selected = st.outbound || st.inbound || st.flight || st.selected || null;
-    if (!selected) return;
-    const normalized = {
-      id: selected.id,
-      from: selected.from,
-      to: selected.to,
-      price: Number(selected.price) || 0,
-      departTime: selected.departTime || selected.depart,
-      arriveTime: selected.arriveTime || selected.arrive,
-      carrier: selected.carrier || selected.airline || selected.carrierCode,
-      flightNo: selected.code || selected.flightNo || selected.flight_number,
-      date: selected.date || selected.flightDate
-    };
-    if (!flight || flight.id !== normalized.id) {
-      dispatch(startBooking(normalized));
-    } else {
-      dispatch(updateFlight(normalized));
+    const norm = (f) => !f ? null : ({
+      id: f.id,
+      from: f.from,
+      to: f.to,
+      price: Number(f.price) || 0,
+      departTime: f.departTime || f.depart,
+      arriveTime: f.arriveTime || f.arrive,
+      carrier: f.carrier || f.airline || f.carrierCode,
+      flightNo: f.code || f.flightNo || f.flight_number,
+      date: f.date || f.flightDate
+    });
+    const outbound = norm(st.outbound || st.flight || st.selected);
+    const inbound = norm(st.inbound);
+    if (!outbound && !inbound) return;
+    if (outbound) {
+      if (!flight || flight.id !== outbound.id) {
+        dispatch(startBooking(outbound));
+      } else {
+        dispatch(updateFlight(outbound));
+      }
+    }
+    if (inbound) {
+      dispatch(updateReturnFlight(inbound));
     }
   }, [location?.state, dispatch, flight?.id]);
 
