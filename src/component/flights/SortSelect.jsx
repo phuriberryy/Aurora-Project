@@ -1,6 +1,12 @@
 import styled from "styled-components";
 import PropTypes from "prop-types";
 
+const Wrap = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
 const Select = styled.select`
   padding: 10px 14px;
   border-radius: 10px;
@@ -10,6 +16,7 @@ const Select = styled.select`
 
 export default function SortSelect({ value, onChange }) {
   return (
+    <Wrap>
     <Select value={value} onChange={(e) => onChange(e.target.value)}>
       <option value="default">ตั้งต้น</option>
       <option value="departTime">เวลาออกเดินทาง</option>
@@ -17,6 +24,7 @@ export default function SortSelect({ value, onChange }) {
       <option value="price">ราคา</option>
       <option value="duration">ระยะเวลาเดินทาง</option>
     </Select>
+    </Wrap>
   );
 }
 
