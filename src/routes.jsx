@@ -42,7 +42,7 @@ export const router = createBrowserRouter([
         element: <BookingPage />,
       },
       {
-        path: 'booking/:id', // :id à¸„à¸·à¸­à¸à¸²à¸£à¸£à¸±à¸š parameter (C)
+        path: 'booking/:id', // :id parameter (C)
         element: <BookingPage />,
       },
       {

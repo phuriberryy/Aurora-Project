@@ -43,7 +43,6 @@ const StyledButton = styled.button`
 `;
 
 // --- Component ---
-// เราจะส่ง "props" ที่เหลือ (เช่น onClick, disabled) ลงไปที่ <button>
 export default function Button({ children, onClick, disabled = false, type = 'button', className, ...rest }) {
   return (
     <StyledButton 
@@ -58,7 +57,6 @@ export default function Button({ children, onClick, disabled = false, type = 'bu
   );
 }
 
-// (นี่คือ PropTypes ตามโจทย์ Definition of Done ครับ)
 Button.propTypes = {
   children: PropTypes.node.isRequired,
   onClick: PropTypes.func,
