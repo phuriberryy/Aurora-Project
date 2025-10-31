@@ -1,12 +1,13 @@
 // ===========================
 // Imports
 // ===========================
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import BookingForm from './BookingForm';
 import Summary from './Summary';
-import { selectStep, selectBooking } from './bookingSlice';
+import { selectStep, selectBooking, startBooking, updateFlight } from './bookingSlice';
 
 
 // ===========================
@@ -47,9 +48,33 @@ const Card = styled.div`
 // หน้าหลักของการจอง ประกอบด้วย Stepper + เนื้อหาตามขั้นตอน (Details/Review/Done)
 // ===========================
 export default function BookingPage(){
-  // --- อ่านค่าจาก Redux store ---
+  const dispatch = useDispatch();
+  const location = useLocation();
   const step = useSelector(selectStep);
   const { confirmation, flight, passengers, extras } = useSelector(selectBooking);
+
+  // Initialize booking from selected flight passed via navigation state
+  useEffect(() => {
+    const st = location?.state || {};
+    const selected = st.outbound || st.inbound || st.flight || st.selected || null;
+    if (!selected) return;
+    const normalized = {
+      id: selected.id,
+      from: selected.from,
+      to: selected.to,
+      price: Number(selected.price) || 0,
+      departTime: selected.departTime || selected.depart,
+      arriveTime: selected.arriveTime || selected.arrive,
+      carrier: selected.carrier || selected.airline || selected.carrierCode,
+      flightNo: selected.code || selected.flightNo || selected.flight_number,
+      date: selected.date || selected.flightDate
+    };
+    if (!flight || flight.id !== normalized.id) {
+      dispatch(startBooking(normalized));
+    } else {
+      dispatch(updateFlight(normalized));
+    }
+  }, [location?.state, dispatch, flight?.id]);
 
   // ===========================
   // Helper: fmtDT
@@ -142,3 +167,4 @@ export default function BookingPage(){
     </Container>
   );
 }
+
