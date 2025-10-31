@@ -24,7 +24,6 @@ const StyledInput = styled.input`
 `;
 
 // --- Component ---
-// เราจะส่ง props (value, onChange, placeholder...) ลงไปที่ <input>
 export default function Input({ type = 'text', value, onChange, placeholder, disabled = false, ...props }) {
   return (
     <StyledInput
@@ -33,12 +32,11 @@ export default function Input({ type = 'text', value, onChange, placeholder, dis
       onChange={onChange}
       placeholder={placeholder}
       disabled={disabled}
-      {...props} // (สำหรับ props อื่นๆ เช่น name, id)
+      {...props}
     />
   );
 }
 
-// (PropTypes ตามโจทย์ Definition of Done)
 Input.propTypes = {
   type: PropTypes.string,
   value: PropTypes.string.isRequired,
