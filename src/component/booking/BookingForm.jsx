@@ -1,3 +1,6 @@
+// ===========================
+// Imports
+// ===========================
 import React, { useMemo, useEffect, useState } from 'react';
 
 import styled from 'styled-components';
@@ -9,6 +12,12 @@ import { getFlight } from '../../services/api';
 
 import MultiSeatPicker from './MultiSeatPicker';
 
+
+// ===========================
+// Styled Components
+// ---------------------------
+// ส่วนนี้คือสไตล์ของ UI เช่น Card, Title, Input ฯลฯ
+// ===========================
 const Card = styled.section`
   padding: 16px;
   background: ${({ theme }) => theme.colors.white};
@@ -86,10 +95,18 @@ const ErrorBox = styled.div`
   font-weight: 600;
 `;
 
+
+// ===========================
+// Component: BookingForm
+// ---------------------------
+// ฟอร์มการจองหลัก: แสดงเที่ยวบิน ผู้โดยสาร ผู้ติดต่อ Extras ที่นั่ง และราคา
+// ===========================
 export default function BookingForm() {
+  // --- Redux hooks ---
   const dispatch = useDispatch();
   const booking = useSelector(selectBooking);
 
+  // --- Local UI state (error flags) ---
   const [errors, setErrors] = useState({
     flight: false,
     contact: { email: false, phone: false },
@@ -97,6 +114,12 @@ export default function BookingForm() {
   });
   const [showErrorMsg, setShowErrorMsg] = useState(false);
 
+  // ===========================
+  // Derived State: formValid
+  // ---------------------------
+  // ตรวจสอบความครบถ้วนของฟอร์มโดยรวมแบบ memoized
+  // เงื่อนไข: ต้องมี flight, email/phone ถูกต้อง, มีผู้โดยสาร และมีชื่อ-นามสกุลครบ
+  // ===========================
   const formValid = useMemo(() => {
     if (!booking.flight) return false;
     const email = booking?.contact?.email || '';
@@ -111,6 +134,14 @@ export default function BookingForm() {
     return true;
   }, [booking.flight, booking?.contact?.email, booking?.contact?.phone, booking?.passengers]);
 
+  // ===========================
+  // Helper: fmtDateTime
+  // ---------------------------
+  // แปลงค่าเวลาหยาบให้เป็นข้อความที่อ่านง่าย:
+  // 1) ถ้าเป็น Date ที่ parse ได้ => แสดง locale string
+  // 2) ถ้าเป็นรูปแบบ HH:mm และมี date ฐาน => สร้าง datetime จาก date+time
+  // 3) อย่างอื่น => คืนค่าเป็น string เดิม
+  // ===========================
   const fmtDateTime = (raw) => {
     if (!raw) return '-';
     const d = new Date(raw);
@@ -125,6 +156,14 @@ export default function BookingForm() {
     return String(raw);
   };
 
+  // ===========================
+  // Effect: เติมข้อมูลเที่ยวบินให้ครบ (เวลา/รหัส/ราคา ฯลฯ) เมื่อมี flight.id
+  // ---------------------------
+  // เงื่อนไข:
+  // - มี flight.id แล้ว
+  // - แต่ยังไม่มี departTime/arriveTime จึง fetch รายละเอียด flight เพิ่มเติม
+  // จากนั้น dispatch(updateFlight) เพื่อเติมข้อมูลที่ขาด
+  // ===========================
   useEffect(() => {
     const id = booking?.flight?.id;
     if (!id) return;
@@ -157,6 +196,15 @@ export default function BookingForm() {
     dispatch
   ]);
 
+  // ===========================
+  // Validator: validate()
+  // ---------------------------
+  // ตรวจสอบทีละส่วนและตั้งค่า error flags:
+  // - flight ต้องมี
+  // - email/phone ต้องถูกต้อง
+  // - ผู้โดยสารทุกคนต้องมี firstName/lastName
+  // คืนค่า true เมื่อผ่านทั้งหมด
+  // ===========================
   const validate = () => {
     const nextErrors = { flight: false, contact: { email: false, phone: false }, passengers: {} };
     if (!booking.flight) {
@@ -179,6 +227,11 @@ export default function BookingForm() {
     return !hasAnyError;
   };
 
+  // ===========================
+  // Handler: handleContinue()
+  // ---------------------------
+  // ถ้าผ่าน validate => ปิดข้อความ error แล้วไปหน้า Summary (goToSummary)
+  // ===========================
   const handleContinue = () => {
     if (validate()) {
       setShowErrorMsg(false);
@@ -186,11 +239,18 @@ export default function BookingForm() {
     }
   };
 
+  // ===========================
+  // Render
+  // ---------------------------
+  // แสดงข้อมูลแต่ละส่วน: Flight / Passengers / Contact / Extras / Seat / Price
+  // พร้อม error message เมื่อกรอกไม่ครบ
+  // ===========================
   return (
     <div>
       <Card>
         <Title>Booking Details</Title>
 
+        {/* -------- Flight Section -------- */}
         <SubTitle>Flight</SubTitle>
         {booking.flight ? (
           <Row>
@@ -203,6 +263,7 @@ export default function BookingForm() {
           <p style={{ color: errors.flight ? '#dc3545' : undefined }}>No flight selected. Return to Flights and choose one.</p>
         )}
 
+        {/* -------- Passengers Section -------- */}
         <SubTitle>Passengers</SubTitle>
         {booking.passengers.map((p) => (
           <Row key={p.id}>
@@ -233,12 +294,14 @@ export default function BookingForm() {
           <Ghost onClick={()=>dispatch(addPassenger())}>+ Add passenger</Ghost>
         </div>
 
+        {/* -------- Contact Section -------- */}
         <SubTitle>Contact</SubTitle>
         <Row>
           <Input $invalid={errors.contact.email} placeholder="Email" value={booking.contact.email} onChange={(e)=>dispatch(updateContact({email: e.target.value}))} />
           <Input $invalid={errors.contact.phone} placeholder="Phone" value={booking.contact.phone} onChange={(e)=>dispatch(updateContact({phone: e.target.value}))} />
         </Row>
 
+        {/* -------- Extras Section -------- */}
         <SubTitle>Extras</SubTitle>
         <Row>
           <label>
@@ -248,6 +311,7 @@ export default function BookingForm() {
           </label>
         </Row>
 
+        {/* -------- Seat Selection Section -------- */}
         <SubTitle>Seat Selection</SubTitle>
         <MultiSeatPicker
           capacity={booking.passengers.length}
@@ -255,6 +319,7 @@ export default function BookingForm() {
           onChange={(arr)=>dispatch(updateExtras({ seats: arr, seatPref: (arr && arr.length>0) ? arr[0] : 'AUTO' }))}
         />
 
+        {/* -------- Price Summary Section -------- */}
         <SubTitle>Price</SubTitle>
         <Row>
           <div>Base: {booking.price.currency} {booking.price.base}</div>
@@ -263,6 +328,7 @@ export default function BookingForm() {
           <div><strong>Total: {booking.price.currency} {booking.price.total}</strong></div>
         </Row>
 
+        {/* -------- Error Message -------- */}
         {showErrorMsg && (
           <ErrorBox>
             Please complete all required fields
@@ -271,6 +337,7 @@ export default function BookingForm() {
 
       </Card>
 
+      {/* -------- Footer Actions -------- */}
       <div style={{display:'flex', gap:12, justifyContent:'flex-end'}}>
         <Button onClick={handleContinue}>Review &amp; Continue</Button>
       </div>
@@ -278,4 +345,3 @@ export default function BookingForm() {
     </div>
   );
 }
-
