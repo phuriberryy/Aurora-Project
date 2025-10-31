@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import styled from 'styled-components';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { loadHistory } from '../component/booking/localHistory';
 
 const Container = styled.main`
   max-width: 700px;
@@ -33,6 +34,16 @@ const Button = styled(Link)`
 
 export default function MyBookingsPage() {
   const booking = useSelector((state) => state.booking);
+  const historyBookings = useMemo(() => {
+    try {
+      const items = loadHistory() || [];
+      return items
+        .filter((it) => it && it.snapshot && it.type === 'booking')
+        .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    } catch (_) {
+      return [];
+    }
+  }, []);
   const fmtDT = (raw, dateBase) => {
     if (!raw) return '-';
     const d = new Date(raw);
@@ -50,34 +61,47 @@ export default function MyBookingsPage() {
     <Container>
       <Heading>My Bookings</Heading>
       <Card>
-        {booking?.confirmation ? (
-          <>
-            <p>Latest booking:</p>
-            <p>PNR: <strong>{booking.confirmation.pnr}</strong></p>
-            <p>Booking ID: {booking.confirmation.bookingId}</p>
-            <div style={{ height: 8 }} />
-            <p>Flight: <strong>{booking.flight ? [booking.flight.carrier, booking.flight.flightNo].filter(Boolean).join(' ') || '-' : '-'}</strong></p>
-            <p>Booker: {(() => {
-              const pax = Array.isArray(booking.passengers) ? booking.passengers : [];
-              const primary = pax.find(p => (p?.type === 'ADT') && (p?.firstName || p?.lastName)) || pax[0];
-              return primary ? `${primary.firstName || ''} ${primary.lastName || ''}`.trim() || '-' : '-';
-            })()}</p>
-            <p>Seat(s): {booking?.extras?.seats && booking.extras.seats.length > 0 ? booking.extras.seats.join(', ') : (booking?.extras?.seatPref || 'AUTO')}</p>
-            <p>Depart: {booking.flight ? fmtDT(booking.flight.departTime, booking.flight.date) : '-'}</p>
-            <p>Arrive: {booking.flight ? fmtDT(booking.flight.arriveTime, booking.flight.date) : '-'}</p>
-            <p>Fare: {booking.flight ? `${booking?.price?.currency || 'THB'} ${booking.flight.price ?? '-'}` : '-'}</p>
-
-            {booking.returnFlight && (
-              <>
-                <hr/>
-                <h4>Return Flight</h4>
-                <p>Flight: <strong>{[booking.returnFlight.carrier, booking.returnFlight.flightNo].filter(Boolean).join(' ') || '-'}</strong></p>
-                <p>Depart: {fmtDT(booking.returnFlight.departTime, booking.returnFlight.date)}</p>
-                <p>Arrive: {fmtDT(booking.returnFlight.arriveTime, booking.returnFlight.date)}</p>
-                <p>Fare: {(booking?.price?.currency || 'THB')} {booking.returnFlight.price ?? '-'}</p>
-              </>
-            )}
-          </>
+        {historyBookings.length > 0 ? (
+          <div>
+            <h3 style={{ marginTop: 0 }}>My Bookings</h3>
+            {historyBookings.map((item, idx) => {
+              const s = item.snapshot || {};
+              const flight = s.flight;
+              const r = s.returnFlight;
+              const pax = Array.isArray(s.passengers) ? s.passengers : [];
+              const booker = (() => {
+                const primary = pax.find(p => (p?.type === 'ADT') && (p?.firstName || p?.lastName)) || pax[0];
+                return primary ? `${primary.firstName || ''} ${primary.lastName || ''}`.trim() || '-' : '-';
+              })();
+              const currency = s.price?.currency || 'THB';
+              return (
+                <div key={item.timestamp + '-' + idx} style={{ padding: '12px 0', borderTop: idx===0 ? '0' : '1px solid rgba(0,0,0,0.06)' }}>
+                  {s.confirmation && (
+                    <>
+                      <div>PNR: <strong>{s.confirmation.pnr}</strong></div>
+                      <div>Booking ID: {s.confirmation.bookingId}</div>
+                    </>
+                  )}
+                  <div style={{ height: 6 }} />
+                  <div>Flight: <strong>{flight ? [flight.carrier, flight.flightNo].filter(Boolean).join(' ') || '-' : '-'}</strong></div>
+                  <div>Booker: {booker}</div>
+                  <div>Seat(s): {Array.isArray(s.extras?.seats) && s.extras.seats.length > 0 ? s.extras.seats.join(', ') : (s.extras?.seatPref || 'AUTO')}</div>
+                  <div>Depart: {flight ? fmtDT(flight.departTime, flight.date) : '-'}</div>
+                  <div>Arrive: {flight ? fmtDT(flight.arriveTime, flight.date) : '-'}</div>
+                  <div>Fare: {flight ? `${currency} ${flight.price ?? '-'}` : '-'}</div>
+                  {r && (
+                    <div style={{ marginTop: 6 }}>
+                      <strong>Return Flight</strong>
+                      <div>Flight: <strong>{[r.carrier, r.flightNo].filter(Boolean).join(' ') || '-'}</strong></div>
+                      <div>Depart: {fmtDT(r.departTime, r.date)}</div>
+                      <div>Arrive: {fmtDT(r.arriveTime, r.date)}</div>
+                      <div>Fare: {currency} {r.price ?? '-'}</div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         ) : (
           <>
             <p>You have no bookings yet.</p>

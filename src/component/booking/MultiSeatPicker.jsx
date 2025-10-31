@@ -50,7 +50,7 @@ const Label = styled.div`
 // - สร้างที่นั่งซ้าย (A..J แถว 1), ช่องทางเดิน, ขวา (A..J แถว 2)
 // - ถ้าเลือกครบ capacity แล้ว ปุ่มที่ยังไม่ถูกเลือกจะถูก disable (opacity ลดลง)
 // ===========================
-export default function MultiSeatPicker({ capacity = 1, value = [], onChange }){
+export default function MultiSeatPicker({ capacity = 1, value = [], onChange, reserved = [] }){
   // --- เตรียมตัวอักษร A..J ด้วย useMemo เพื่อลดการคำนวณซ้ำ ---
   const letters = useMemo(() => Array.from({ length: 10 }, (_, i) => String.fromCharCode('A'.charCodeAt(0) + i)), []); // A..J
 
@@ -84,9 +84,11 @@ export default function MultiSeatPicker({ capacity = 1, value = [], onChange }){
   // - ปุ่มจะสะท้อนสถานะ selected/disabled
   // - onClick จะ toggle ที่นั่งนั้น (ถ้าไม่ disabled)
   // ===========================
+  const reservedSet = useMemo(() => new Set((reserved || []).map(String)), [reserved]);
   const renderCol = (arr) => arr.map(code => {
     const isSel = selected.has(code);
-    const disabled = !isSel && maxed;
+    const isReserved = reservedSet.has(code);
+    const disabled = (!isSel && maxed) || (isReserved && !isSel);
     return (
       <Seat key={code} $selected={isSel} $disabled={disabled} onClick={()=>!disabled && toggle(code)}>{code}</Seat>
     );
