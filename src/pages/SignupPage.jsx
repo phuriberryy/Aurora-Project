@@ -114,7 +114,7 @@ export default function SignupPage() {
       await registerUser(newUser);
       dispatch(showToast({ message: 'Signup successful! Welcome!', type: 'success' }));
       setTimeout(() => {
-        navigate('/login'); // พาผู้ใช้ไปหน้า Login หลังสมัครสำเร็จ
+        navigate('/'); // พาผู้ใช้ไปหน้า Login หลังสมัครสำเร็จ
       }, 1500);
     } catch (error) {
       console.error('Signup error:', error);

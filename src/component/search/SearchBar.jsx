@@ -15,13 +15,13 @@ const Card = styled.form`
   display: grid;
   gap: 10px;
 `;
-
+//One-way / Return
 const ToggleRow = styled.div`
   display: flex;
   justify-content: center;
   gap: 8px;
 `;
-
+// ปุ่มสลับโหมด One-way / Return
 const ToggleBtn = styled.button`
   padding: 6px 14px;
   border-radius: 20px;
@@ -30,10 +30,10 @@ const ToggleBtn = styled.button`
   color: ${(p) => (p.$active ? "#fff" : "#000")};
   cursor: pointer;
 `;
-
-export default function SearchBar({ value, onChange, onSearch, options, isLoadingOptions }) {
+//เรียกใช้  ----ส่งข้อมูลเข้ามา 5 อย่าง
+function SearchBar({ value, onChange, onSearch, options, isLoadingOptions }) {
   const [trip, setTrip] = useState("oneway");
-  const { from = "", to = "", date = "", returnDate = "" } = value;
+  const { from = "", to = "", date = "", returnDate = "" } = value;   //ดึงค่าที่ผู้ใช้กรอกจาก props
   const { origins = [], destinations = [] } = options || {};
 
   const handleSubmit = (e) => {
@@ -41,7 +41,7 @@ export default function SearchBar({ value, onChange, onSearch, options, isLoadin
     if (!from || !to || !date) return;
     const data = { from, to, date };
     if (trip === "return") data.returnDate = returnDate;
-    onSearch(data);
+    onSearch(data);  //ส่งข้อมูลทั้งหมดกลับไปให้หน้า HomePage ผ่าน onSearch
   };
 
   return (
@@ -59,7 +59,7 @@ export default function SearchBar({ value, onChange, onSearch, options, isLoadin
       {/* ช่องกรอกข้อมูล */}
       <Select value={from} onChange={(e) => onChange({ from: e.target.value })} disabled={isLoadingOptions}>
         <option value="">Select departure</option>
-        {origins.map((o) => <option key={o}>{o}</option>)}
+        {origins.map((o) => <option key={o}>{o}</option>)}   //ถ้ายังโหลดไม่เสร็จ (isLoadingOptions เป็น true) จะ disable
       </Select>
 
       <Select value={to} onChange={(e) => onChange({ to: e.target.value })} disabled={isLoadingOptions}>
@@ -97,3 +97,4 @@ SearchBar.propTypes = {
 };
 
 
+export default SearchBar;
