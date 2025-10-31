@@ -257,7 +257,7 @@ export default function BookingForm() {
             <div><strong>{booking.flight.carrier} {booking.flight.flightNo}</strong></div>
             <div>Depart: {fmtDateTime(booking.flight.departTime)}</div>
             <div>Arrive: {fmtDateTime(booking.flight.arriveTime)}</div>
-            <div>Fare: {booking.price.currency} {booking.price.base}</div>
+            <div>Fare: {booking.price.currency} {booking.flight?.price}</div>
           </Row>
         ) : (
           <p style={{ color: errors.flight ? '#dc3545' : undefined }}>No flight selected. Return to Flights and choose one.</p>

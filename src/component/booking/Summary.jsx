@@ -140,6 +140,18 @@ export default function Summary(){
         <p><strong>Flight:</strong> {booking.flight?.carrier} {booking.flight?.flightNo}</p>
         <p><strong>Depart:</strong> {fmtDateTime(booking.flight?.departTime)}</p>
         <p><strong>Arrive:</strong> {fmtDateTime(booking.flight?.arriveTime)}</p>
+        <p><strong>Fare:</strong> {booking.price.currency} {booking.flight?.price}</p>
+
+        {booking.returnFlight && (
+          <>
+            <hr/>
+            <h4>Return Flight</h4>
+            <p><strong>Flight:</strong> {booking.returnFlight?.carrier} {booking.returnFlight?.flightNo}</p>
+            <p><strong>Depart:</strong> {fmtDateTime(booking.returnFlight?.departTime)}</p>
+            <p><strong>Arrive:</strong> {fmtDateTime(booking.returnFlight?.arriveTime)}</p>
+            <p><strong>Fare:</strong> {booking.price.currency} {booking.returnFlight?.price}</p>
+          </>
+        )}
         <hr/>
         <h4>Passengers</h4>
         <ul>
