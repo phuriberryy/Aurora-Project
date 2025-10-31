@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import http from "../services/http";
 import FlightList from "../component/flights/FlightList";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";

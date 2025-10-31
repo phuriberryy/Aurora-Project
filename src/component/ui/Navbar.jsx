@@ -7,13 +7,11 @@ const NavWrapper = styled.header`
   background-color: ${({ theme }) => theme.colors.dark};
   padding: ${({ theme }) => theme.spacing.medium} ${({ theme }) => theme.spacing.large};
   
-  /* 1. (ตกแต่ง) ใช้ Flexbox เพื่อจัดให้ โลโก้ อยู่ซ้าย และ ลิงก์ อยู่ขวา */
   display: flex;
   justify-content: space-between;
   align-items: center;
 `;
 
-// 2. (ตกแต่ง) สร้าง Style เฉพาะสำหรับ "โลโก้" ให้เด่น
 const LogoLink = styled(Link)`
   color: ${({ theme }) => theme.colors.white};
   text-decoration: none;
@@ -25,13 +23,16 @@ const LogoLink = styled(Link)`
   }
 `;
 
-// 3. (ตกแต่ง) สร้าง Style สำหรับ "ลิงก์อื่นๆ" ด้านขวา
 const NavLinks = styled.div`
+  display: flex;
+  align-items: center;
+  gap: ${({ theme }) => theme.spacing.large};
+
   a {
     color: ${({ theme }) => theme.colors.white};
     text-decoration: none;
     font-size: 1rem;
-    margin-left: ${({ theme }) => theme.spacing.large}; /* เว้นระยะห่างระหว่างลิงก์ */
+    margin-left: ${({ theme }) => theme.spacing.large};
 
     &:hover {
       color: ${({ theme }) => theme.colors.primary};
@@ -39,23 +40,43 @@ const NavLinks = styled.div`
   }
 `;
 
+const StyledLink = styled(Link)`
+  &:hover {
+    color: ${({ theme }) => theme.colors.primary};
+  }
+`;
+
+const IconLink = styled(Link)`
+  color: ${({ theme }) => theme.colors.white};
+  display: flex;
+  align-items: center;
+  
+  svg {
+    width: 26px;
+    height: 26px;
+    fill: currentColor;
+  }
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.primary};
+  }
+`;
+
 // --- Component ---
 export default function Navbar() {
   return (
     <NavWrapper>
-      {/* (โลโก้/ลิงก์หน้าแรก ด้านซ้าย) */}
       <LogoLink to="/">Aurora Airways</LogoLink>
       
-      {/* (ลิงก์อื่นๆ ด้านขวา) */}
       <NavLinks>
-        {/* 4. (เพิ่มลิงก์) นี่คือลิงก์ "My Bookings" ที่เราเพิ่มเข้ามา 
-          (อย่าลืมไปเพิ่ม path นี้ใน routes.jsx และบอกให้ Owner C สร้างหน้านี้ด้วยนะครับ!)
-        */}
-        <Link to="/my-bookings">My Bookings</Link>
-        <Link to="/login">Login</Link>
+        <StyledLink to="/my-bookings">My Bookings</StyledLink>
+        <IconLink to="/login" title="Login / Profile">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 4c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm0 14c-2.03 0-4.43-.82-6.14-2.88C7.55 15.8 9.68 15 12 15s4.45.8 6.14 2.12C16.43 19.18 14.03 20 12 20z"/>
+          </svg>
+        </IconLink>
         
       </NavLinks>
     </NavWrapper>
   );
 }
-

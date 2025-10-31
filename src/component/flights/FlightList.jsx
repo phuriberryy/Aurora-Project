@@ -1,4 +1,4 @@
-﻿import PropTypes from "prop-types";
+import PropTypes from "prop-types";
 import FlightCard from "./FlightCard";
 
 const FlightList = ({ flights, date }) => {
