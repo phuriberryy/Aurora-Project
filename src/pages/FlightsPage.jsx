@@ -121,7 +121,7 @@ const FlightsPage = () => {
                     <strong>{from} → {to}</strong> • {departDate}
                     {isReturn && <div><strong>{to} → {from}</strong> • {returnDate}</div>}
                 </div>
-                <Link to={`/?from=${from}&to=${to}&date=${departDate}${isReturn ? `&returnDate=${returnDate}` : ""}`}>
+                <Link to={`/home?from=${from}&to=${to}&date=${departDate}${isReturn ? `&returnDate=${returnDate}` : ""}`}>
                     Edit search
                 </Link>
             </div>
