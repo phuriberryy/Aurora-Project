@@ -2,6 +2,7 @@
 // Imports
 // ===========================
 import { createSlice, createAsyncThunk, nanoid } from '@reduxjs/toolkit';
+import { addRecord, addBookingSnapshot } from './localHistory';
 
 
 // ===========================
@@ -221,6 +222,27 @@ const bookingSlice = createSlice({
         state.status = 'succeeded';
         state.confirmation = action.payload;
         state.step = 3;
+        try {
+          const seatList = Array.isArray(state?.extras?.seats) ? state.extras.seats : [];
+          const names = Array.isArray(state?.passengers) ? state.passengers.map(p => `${p.firstName||''} ${p.lastName||''}`.trim()).filter(Boolean) : [];
+          addRecord({
+            flightId: state?.flight?.id,
+            date: state?.flight?.date,
+            seats: seatList,
+            passengerNames: names
+          });
+          addBookingSnapshot({
+            confirmation: state.confirmation,
+            flight: state.flight,
+            returnFlight: state.returnFlight,
+            passengers: state.passengers,
+            contact: state.contact,
+            extras: state.extras,
+            price: state.price,
+          });
+        } catch (_) {
+          // ignore persistence errors
+        }
       })
       // ล้มเหลว: เก็บข้อความผิดพลาด
       .addCase(submitBooking.rejected, (state, action) => {
