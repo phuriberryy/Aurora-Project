@@ -21,7 +21,6 @@ export const cancelBooking = (bookingId) => {
 // --- User Authentication API ---
 
 export const registerUser = (userData) => {
-  // POST /user -> สร้าง user ใหม่
   return http.post('/users', userData);
 };
 

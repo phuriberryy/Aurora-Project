@@ -2,19 +2,14 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Link, useNavigate } from 'react-router-dom';
 
-// --- 1. เชื่อมต่อ UI Kit (Button, Input) ---
 import Button from '../component/ui/Button';
 import Input from '../component/ui/Input';
 
-// --- 2. เชื่อมต่อ Redux (สำหรับ Toast) ---
 import { useDispatch } from 'react-redux';
 import { showToast } from '../features/ui/uiSlice';
 
-// --- 3. เชื่อมต่อ API ---
-// (เราจะใช้ loginUser ที่มาจาก api.js ซึ่งเชื่อมกับ http.js ที่ถูกต้อง)
 import { loginUser } from '../services/api'; 
 
-// --- Styled Components (เหมือน SignupPage) ---
 const LoginPageWrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -73,37 +68,28 @@ const SignupLink = styled.p`
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  // 4. (เชื่อมต่อ API) เพิ่ม State สำหรับ Loading
   const [isLoading, setIsLoading] = useState(false);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // 5. (เชื่อมต่อ API) เปลี่ยน handleSubmit ให้เป็น async
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // 6. (เชื่อมต่อ API) ยิง API (loginUser จะค้นหา user จาก email)
       const response = await loginUser(email); 
 
-      // 7. (เชื่อมต่อ API) ตรวจสอบสิ่งที่ API คืนมา
       if (response.data.length === 0) {
-        // (ไม่เจอ Email นี้ในระบบ)
         dispatch(showToast({ message: 'Email not found. Please sign up.', type: 'error' }));
       
       } else {
-        // (เจอ Email -> เอา user คนแรกมาเช็ก Password)
         const user = response.data[0];
         if (user.password !== password) {
-          // (Password ไม่ตรง)
           dispatch(showToast({ message: 'Incorrect password. Please try again.', type: 'error' }));
         } else {
-          // (สำเร็จ!)
           dispatch(showToast({ message: 'Login Successful! Redirecting...', type: 'success' }));
           
-          // (Bonus: พาผู้ใช้กลับหน้าแรกหลังล็อกอินเสร็จ)
           setTimeout(() => {
             navigate('/home');
           }, 1500);
@@ -111,12 +97,11 @@ export default function LoginPage() {
       }
 
     } catch (error) {
-      // (ถ้า API ล่ม หรือ Error อื่นๆ)
       console.error('Login error:', error);
       dispatch(showToast({ message: 'An error occurred. Please try again.', type: 'error' }));
     
     } finally {
-      setIsLoading(false); // (หยุดโหลด)
+      setIsLoading(false);
     }
   };
 
@@ -126,7 +111,6 @@ export default function LoginPage() {
         <Title>Login</Title>
         <InputGroup>
           <Label htmlFor="email">Email</Label>
-          {/* (เชื่อมต่อ UI Kit) เพิ่ม disabled={isLoading} */}
           <Input
             type="email"
             id="email"
@@ -148,7 +132,6 @@ export default function LoginPage() {
           />
         </InputGroup>
         
-        {/* (เชื่อมต่อ UI Kit) เพิ่ม disabled และเปลี่ยนข้อความ */}
         <Button 
           type="submit" 
           style={{ width: '100%', padding: '0.9rem', fontSize: '1.1rem' }}

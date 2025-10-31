@@ -67,5 +67,5 @@ export default function Modal({ children }) {
 }
 
 Modal.propTypes = {
-  children: PropTypes.node, // เนื้อหาข้างใน (เช่น ฟอร์มจอง)
+  children: PropTypes.node,
 };
