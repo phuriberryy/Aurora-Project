@@ -162,7 +162,18 @@ export default function BookingForm() {
         }));
       }).catch(() => {});
     }
-  }, [booking?.flight?.id, booking?.flight?.departTime, booking?.flight?.arriveTime, booking?.flight?.carrier, booking?.flight?.flightNo, booking.price.base, dispatch]);
+  }, [
+    booking?.flight?.id,
+    booking?.flight?.departTime,
+    booking?.flight?.arriveTime,
+    booking?.flight?.carrier,
+    booking?.flight?.flightNo,
+    booking?.flight?.date,
+    booking?.flight?.from,
+    booking?.flight?.to,
+    booking.price.base,
+    dispatch
+  ]);
 
 
 
@@ -307,7 +318,9 @@ export default function BookingForm() {
 
       <div style={{display:'flex', gap:12, justifyContent:'flex-end'}}>
 
-        <Button disabled={!formValid} onClick={()=>dispatch(goToSummary())}>Review & Continue -></Button>
+        <Button disabled={!formValid} onClick={() => dispatch(goToSummary())}> Review &amp; 
+          Continue →
+        </Button>
 
       </div>
 

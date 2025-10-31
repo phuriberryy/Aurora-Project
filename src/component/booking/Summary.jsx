@@ -66,7 +66,18 @@ export default function Summary(){
         })
         .catch(() => {});
     }
-  }, [booking?.flight?.id]);
+  }, [
+    booking?.flight?.id,
+    booking?.flight?.departTime,
+    booking?.flight?.arriveTime,
+    booking?.flight?.date,
+    booking?.flight?.from,
+    booking?.flight?.to,
+    booking?.flight?.carrier,
+    booking?.flight?.flightNo,
+    booking.price.base,
+    dispatch
+  ]);
 
   const handleConfirm = () => {
     const payload = {
