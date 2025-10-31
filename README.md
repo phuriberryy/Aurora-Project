@@ -1,46 +1,85 @@
-✈️ Aurora Airways Project
-
-นี่คือโปรเจกต์ React สำหรับจำลองการจองตั๋วเครื่องบิน สร้างขึ้นโดยใช้ Create React App, Redux Toolkit, React Router, และ Styled-Components
-
-🚀 วิธีการรันโปรเจกต์
-
-1. ติดตั้ง Dependencies
-
-(ทำครั้งแรกเท่านั้น)
-
-npm install
+Aurora Project – React Flight Booking 
+=========================================
+Member
+--------
+672110140 ณัฐรินทร์ อาณัติธนันท์กุล 
+672110137 กันตพงษ์ กันหามิ่ง 
+672110234 ปิยาพัชร ใหม่อารินทร  
+672110239 ภูริชญา หลำสวัสดิ์
 
 
-2. ตั้งค่า Environment //ยังใส่ .env ไม่ได้ เดี๋ยวแก้
+Overview
+--------
+Aurora Project is a single-page flight booking demo built with React. It showcases a complete user journey from searching flights, sorting results, picking seats, and completing a booking, while also covering authentication and reusable UI patterns. The app uses Redux Toolkit for state management, styled-components for theming, and a public MockAPI backend for flight and user data.
 
-(สำคัญมาก!)
+Key Features
+------------
+- Flight search with one-way/return toggle, validation, and dynamic airport options.
+- Results page with client-side sorting (price, departure, arrival, duration).
+- Booking workflow backed by Redux: passenger forms, contact info, extras, multi-seat picker, summary, and confirmation.
+- Authentication flow (signup/login) with toast notifications and mock API integration.
+- Persistent booking summary page that reads from the Redux store.
+- Global layout with navbar, modal, and toast system wired to the UI slice.
+- UI kit showcase page demonstrating shared Button/Input components and theme usage.
 
-โปรเจกต์นี้ต้องการไฟล์ .env เพื่อกำหนดค่า API
+Tech Stack
+----------
+- React 18 with React Router v6 (`createBrowserRouter`, `RouterProvider`).
+- Redux Toolkit (`configureStore`, `createSlice`, `createAsyncThunk`, `useSelector`, `useDispatch`).
+- styled-components (`ThemeProvider`, `createGlobalStyle`) for design system and layout.
+- Axios instance wrapper for REST communication with MockAPI.
+- PropTypes for component prop validation.
 
-สร้างไฟล์ใหม่ชื่อ .env (ที่ root ของโปรเจกต์ ระดับเดียวกับไฟล์นี้)
+Project Structure (selected)
+----------------------------
+```
+src/
+  component/
+    search/          – SearchBar and related UI controls
+    flights/         – Flight cards, list, sort select
+    booking/         – Booking wizard, Redux slice, seat picker
+    ui/              – Shared UI primitives (Button, Input, Layout, Navbar, Modal, Toast)
+  features/          – Redux slices (ui)
+  pages/             – Top-level routes (Home, Flights, Booking, Login, Signup, MyBookings, NotFound, UIKit)
+  services/          – API and HTTP helpers
+  index.js           – App bootstrap with providers
+  routes.jsx         – Router definition
+  theme.js           – Theme tokens
+  GlobalStyle.js     – Global CSS baseline
+```
 
-คัดลอกเนื้อหาจาก .env.example (ไฟล์ตัวอย่าง) ไปวางใน .env
+Getting Started
+---------------
+1. **Install dependencies**
+   ```
+   npm install
+   ```
+2. **Run the development server**
+   ```
+   npm start
+   ```
+   The app runs on <http://localhost:3000> by default with hot reload enabled.
+3. **Build for production**
+   ```
+   npm run build
+   ```
+4. **Lint the project** (if configured in package.json)
+   ```
+   npm run lint
+   ```
 
-(ไฟล์ .env ของคุณควรจะมีหน้าตาแบบนี้):
+API Configuration
+-----------------
+The axios client at `src/services/http.js` targets `https://6900a4f3ff8d792314bacf9b.mockapi.io/api/v1`. Environment variables (`REACT_APP_*`) may be added to `.env` for advanced booking endpoints (see `bookingSlice.js` for supported keys).
 
-REACT_APP_API_BASE_URL=[https://api.aurora-airways.dev/v1](https://api.aurora-airways.dev/v1)
+Testing Notes
+-------------
+- Client-side validation is present in SearchBar and BookingForm to prevent invalid submissions.
+- Redux booking slice includes async thunk `submitBooking` that simulates seat reservation and handles network errors gracefully.
+- MyBookingsPage reads booking confirmation straight from the Redux store so state persists across route changes during a session.
 
-
-3. รันโปรเจกต์
-
-หลังจากติดตั้งและตั้งค่า .env แล้ว ให้รันคำสั่งนี้:
-
-npm start
-
-
-แอปพลิเคชันจะเปิดที่ http://localhost:3000
-
-👩‍💻 โครงสร้างทีม (Owners)
-
-A (Search/Discovery): HomePage, SearchBar, searchSlice
-
-B (Flights Results/Detail): FlightsPage, FlightList, FlightCard, flightsSlice
-
-C (Booking Flow): BookingPage, BookingForm, Summary, bookingSlice
-
-D (Shell & UI/Kit): Layout, Navbar, Router, Theme, UI Kit (Button, Modal...), uiSlice
+Future Improvements
+-------------------
+- Implement real flight detail page (`/flights/:id`).
+- Add persistent authentication/session management.
+- Expand automated tests (unit/e2e) for forms and Redux flows.
