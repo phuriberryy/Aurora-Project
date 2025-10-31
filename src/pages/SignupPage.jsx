@@ -67,6 +67,12 @@ const LoginLink = styled.p`
   }
 `;
 
+const SignupButton = styled(Button)`
+  width: 100%;
+  padding: 0.9rem;
+  font-size: 1.1rem;
+`;
+
 export default function SignupPage() {
   const [formData, setFormData] = useState({
     name: '',
@@ -168,9 +174,9 @@ export default function SignupPage() {
           />
         </InputGroup>
         
-        <Button type="submit" style={{ width: '100%', padding: '0.9rem', fontSize: '1.1rem' }} disabled={loading}>
-          Sign Up
-        </Button>
+        <SignupButton type="submit" disabled={loading}>
+          {loading ? 'Creating Account...' : 'Sign Up'}
+        </SignupButton>
         
         <LoginLink>
           Already have an account? <Link to="/login">Login</Link>
