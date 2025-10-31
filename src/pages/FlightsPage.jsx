@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState, useMemo } from "react";
+﻿import React, { useEffect, useState, useMemo, useRef } from "react";
 import http from "../services/http";
 import FlightList from "../component/flights/FlightList";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
@@ -25,6 +25,8 @@ const FlightsPage = () => {
     const departDate = params.get("date");
     const returnDate = params.get("returnDate");
     const isReturn = !!returnDate;
+    const returnRef = useRef(null);
+    const [isHighlighting, setIsHighlighting] = useState(false);
 
     useEffect(() => {
         if (!from || !to || !departDate) navigate("/", { replace: true });
@@ -62,7 +64,7 @@ const FlightsPage = () => {
                     const response = await http.get("/flights", {
                         params: { from, to, date: departDate }
                     });
-                    const list =(response.data || []).map(f => ({ ...f, _segment: "outbound" }));
+                    const list = (response.data || []).map(f => ({ ...f, _segment: "outbound" }));
                     setFlights(list);
                 }
             } catch (err) {
@@ -91,12 +93,16 @@ const FlightsPage = () => {
         if (flight._segment === "return") {
             setSelRet(flight);
             if (selOut) {
-            navigate("/booking", { state: { outbound: selOut, inbound: flight } });
+                navigate("/booking", { state: { outbound: selOut, inbound: flight } });
             }
         } else {
             setSelOut(flight);
-            if (!isReturn) {
-            navigate("/booking", { state: { outbound: flight } });
+            if (isReturn) {
+                returnRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                setIsHighlighting(true);
+                setTimeout(() => setIsHighlighting(false), 1000);
+            } else {
+                navigate("/booking", { state: { outbound: flight } });
             }
         }
     };
@@ -125,9 +131,35 @@ const FlightsPage = () => {
             {sorted.length === 0 ? (
                 <p>No flights available.</p>
             ) : (
-                <FlightList flights={sorted} date={departDate} onSelect={handleSelect}/>
-
-            )}
+                <>
+                <FlightList
+                    flights={sorted.filter((f) => f._segment === "outbound")}
+                    date={departDate}
+                    onSelect={handleSelect}
+                />
+                {isReturn && (
+                <>
+                    <h2
+                        ref={returnRef}
+                        style={{
+                            marginTop: 24,
+                            transition: "background-color 0.5s ease",
+                            backgroundColor: isHighlighting
+                                ? "rgba(255, 235, 59, 0.4)"
+                                : "transparent",
+                            padding: "6px 10px",
+                            borderRadius: "8px",
+                        }}
+                    >Return • {to} → {from} • {returnDate}</h2>
+                    <FlightList
+                        flights={sorted.filter((f) => f._segment === "return")}
+                        date={returnDate}
+                        onSelect={handleSelect}
+                    />
+                </>
+                )}   
+                </>
+            )}         
         </div>
     );
 };
