@@ -63,6 +63,8 @@ const Input = styled.input`
 
   padding: 10px 12px;
 
+  margin: 10px 0;
+
   border-radius: 10px;
 
   border: 1px solid rgba(0,0,0,0.12);
@@ -77,6 +79,8 @@ const Select = styled.select`
 
   padding: 10px 12px;
 
+  margin: 10px 0;
+
   border-radius: 10px;
 
   border: 1px solid rgba(0,0,0,0.12);
@@ -90,6 +94,8 @@ const Select = styled.select`
 const Button = styled.button`
 
   padding: 10px 14px;
+
+  margin: 10px 0;
 
   border-radius: 10px;
 
