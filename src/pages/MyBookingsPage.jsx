@@ -16,7 +16,7 @@ const Card = styled.div`
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.dark};
   padding: 16px;
-  border-radius: 12px;
+  border-radius: 20px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.08);
   border: 1px solid rgba(0,0,0,0.06);
 `;
