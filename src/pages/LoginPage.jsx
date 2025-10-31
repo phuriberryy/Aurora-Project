@@ -105,7 +105,7 @@ export default function LoginPage() {
           
           // (Bonus: พาผู้ใช้กลับหน้าแรกหลังล็อกอินเสร็จ)
           setTimeout(() => {
-            navigate('/');
+            navigate('/home');
           }, 1500);
         }
       }
