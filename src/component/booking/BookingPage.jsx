@@ -33,7 +33,19 @@ const Card = styled.div`
 
 export default function BookingPage(){
   const step = useSelector(selectStep);
-  const { confirmation } = useSelector(selectBooking);
+  const { confirmation, flight, passengers, extras } = useSelector(selectBooking);
+  const fmtDT = (raw, dateBase) => {
+    if (!raw) return '-';
+    const d = new Date(raw);
+    if (!Number.isNaN(d.valueOf())) return d.toLocaleString();
+    if (dateBase && /^\d{2}:\d{2}/.test(String(raw))) {
+      const t = String(raw).slice(0,5);
+      const composed = `${dateBase}T${t}:00`;
+      const d2 = new Date(composed);
+      if (!Number.isNaN(d2.valueOf())) return d2.toLocaleString();
+    }
+    return String(raw);
+  };
   return (
     <Container>
       <h1 style={{ color: '#0062E6' }}>Booking</h1>
@@ -51,6 +63,16 @@ export default function BookingPage(){
             <>
               <p>PNR: <strong>{confirmation.pnr}</strong></p>
               <p>Booking ID: {confirmation.bookingId}</p>
+              <div style={{ height: 8 }} />
+              <p>Flight: <strong>{flight ? [flight.carrier, flight.flightNo].filter(Boolean).join(' ') || '-' : '-'}</strong></p>
+              <p>Booker: {(() => {
+                const pax = Array.isArray(passengers) ? passengers : [];
+                const primary = pax.find(p => (p?.type === 'ADT') && (p?.firstName || p?.lastName)) || pax[0];
+                return primary ? `${primary.firstName || ''} ${primary.lastName || ''}`.trim() || '-' : '-';
+              })()}</p>
+              <p>Seat(s): {extras?.seats && extras.seats.length > 0 ? extras.seats.join(', ') : (extras?.seatPref || 'AUTO')}</p>
+              <p>Depart: {flight ? fmtDT(flight.departTime, flight.date) : '-'}</p>
+              <p>Arrive: {flight ? fmtDT(flight.arriveTime, flight.date) : '-'}</p>
             </>
           ) : (
             <p>Your booking is confirmed.</p>

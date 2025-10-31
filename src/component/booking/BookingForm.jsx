@@ -226,7 +226,7 @@ export default function BookingForm() {
               <option value="UNSPEC">Gender</option>
               <option value="M">Male</option>
               <option value="F">Female</option>
-              <option value="X">None</option>
+              <option value="etc.">etc.</option>
             </Select>
 
             {booking.passengers.length > 1 && (
