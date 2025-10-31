@@ -7,13 +7,13 @@ const Card = styled.div`
   padding: 16px;
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.dark};
-  border-radius: 12px;
+  border-radius: 20px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.08);
   border: 1px solid rgba(0,0,0,0.06);
 `;
 const Button = styled.button`
   padding: 10px 14px;
-  border-radius: 10px;
+  border-radius: 20px;
   border: 0;
   background: ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.colors.white};
