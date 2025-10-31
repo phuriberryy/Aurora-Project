@@ -33,12 +33,31 @@ const ToggleBtn = styled.button`
 //เรียกใช้  ----ส่งข้อมูลเข้ามา 5 อย่าง
 function SearchBar({ value, onChange, onSearch, options, isLoadingOptions }) {
   const [trip, setTrip] = useState("oneway");
+  const [error, setError] = useState("");
   const { from = "", to = "", date = "", returnDate = "" } = value;   //ดึงค่าที่ผู้ใช้กรอกจาก props
   const { origins = [], destinations = [] } = options || {};
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!from || !to || !date) return;
+    if (!from || !to || !date) {
+      setError("Please fill in all search fields.");
+      return;
+    }
+    if (from === to) {
+      setError("Departure and destination must be different airports.");
+      return;
+    }
+    if (trip === "return") {
+      if (!returnDate) {
+        setError("Please select your return date.");
+        return;
+      }
+      if (returnDate < date) {
+        setError("Return date cannot be earlier than the departure date.");
+        return;
+      }
+    }
+    setError("");
     const data = { from, to, date };
     if (trip === "return") data.returnDate = returnDate;
     onSearch(data);  //ส่งข้อมูลทั้งหมดกลับไปให้หน้า HomePage ผ่าน onSearch
@@ -48,30 +67,74 @@ function SearchBar({ value, onChange, onSearch, options, isLoadingOptions }) {
     <Card onSubmit={handleSubmit}>
       {/* ปุ่มสลับโหมด */}
       <ToggleRow>
-        <ToggleBtn type="button" $active={trip === "oneway"} onClick={() => setTrip("oneway")}>
+        <ToggleBtn
+          type="button"
+          $active={trip === "oneway"}
+          onClick={() => {
+            setTrip("oneway");
+            setError("");
+          }}
+        >
           One-way
         </ToggleBtn>
-        <ToggleBtn type="button" $active={trip === "return"} onClick={() => setTrip("return")}>
+        <ToggleBtn
+          type="button"
+          $active={trip === "return"}
+          onClick={() => {
+            setTrip("return");
+            setError("");
+          }}
+        >
           Return
         </ToggleBtn>
       </ToggleRow>
 
       {/* ช่องกรอกข้อมูล */}
-      <Select value={from} onChange={(e) => onChange({ from: e.target.value })} disabled={isLoadingOptions}>
+      <Select
+        value={from}
+        onChange={(e) => {
+          onChange({ from: e.target.value });
+          setError("");
+        }}
+        disabled={isLoadingOptions}
+      >
         <option value="">Select departure</option>
         {origins.map((o) => <option key={o}>{o}</option>)}   //ถ้ายังโหลดไม่เสร็จ (isLoadingOptions เป็น true) จะ disable
       </Select>
 
-      <Select value={to} onChange={(e) => onChange({ to: e.target.value })} disabled={isLoadingOptions}>
+      <Select
+        value={to}
+        onChange={(e) => {
+          onChange({ to: e.target.value });
+          setError("");
+        }}
+        disabled={isLoadingOptions}
+      >
         <option value="">Select destination</option>
         {destinations.map((d) => <option key={d}>{d}</option>)}
       </Select>
 
-      <Input type="date" value={date} onChange={(e) => onChange({ date: e.target.value })} />
+      <Input
+        type="date"
+        value={date}
+        onChange={(e) => {
+          onChange({ date: e.target.value });
+          setError("");
+        }}
+      />
 
       {trip === "return" && (
-        <Input type="date" value={returnDate} onChange={(e) => onChange({ returnDate: e.target.value })} />
+        <Input
+          type="date"
+          value={returnDate}
+          onChange={(e) => {
+            onChange({ returnDate: e.target.value });
+            setError("");
+          }}
+        />
       )}
+
+      {error && <p style={{ margin: 0, color: "#dc3545", fontWeight: 600 }}>{error}</p>}
 
       <Button type="submit" disabled={isLoadingOptions}>
         Search
