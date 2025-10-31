@@ -90,6 +90,7 @@ export const submitBooking = createAsyncThunk(
 const initialState = {
   id: null, // local temp id for UI
   flight: null, // {id, carrier, flightNo, depart, arrive, price}
+  returnFlight: null, // optional return leg {id, carrier, flightNo, depart, arrive, price}
   passengers: [
     // {id, firstName, lastName, gender, dob, type:'ADT'|'CHD'|'INF'}
   ],
@@ -142,6 +143,7 @@ const bookingSlice = createSlice({
         const { flight } = action.payload;
         state.id = nanoid();
         state.flight = flight;
+        state.returnFlight = null;
         state.step = 1;
         state.status = 'idle';
         state.error = null;
@@ -154,6 +156,9 @@ const bookingSlice = createSlice({
       prepare(flight) {
         return { payload: { flight } };
       }
+    },
+    updateReturnFlight(state, action) {
+      state.returnFlight = { ...(state.returnFlight || {}), ...(action.payload || {}) };
     },
 
     // เพิ่มผู้โดยสารใหม่ (ค่าเริ่มต้นเป็น ADT)
@@ -236,7 +241,8 @@ const bookingSlice = createSlice({
   goToSummary,
   backToForm,
   resetBooking,
-  updateFlight
+  updateFlight,
+  updateReturnFlight
 } = bookingSlice.actions;
 
 export const selectBooking = (state) => state.booking;
