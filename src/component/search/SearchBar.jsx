@@ -9,7 +9,7 @@ import Select from "../ui/Select";
 
 const Card = styled.form`
   border: 1px solid #ccc;
-  border-radius: 12px;
+  border-radius: 20px;
   padding: 16px;
   background: #fff;
   display: grid;
