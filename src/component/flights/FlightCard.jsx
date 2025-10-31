@@ -1,9 +1,7 @@
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import Button from "../ui/Button";
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { startBooking } from '../../component/booking/bookingSlice';
+
 
 const Card = styled.div`
   display: flex;
@@ -37,21 +35,7 @@ const Price = styled.div`
   color: #0077cc;
 `;
 
-const FlightCard = ({ flight, date }) => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const handleSelect = () => {
-    const mapped = {
-      id: String(flight.id),
-      flightNo: flight.code,
-      departTime: flight.departTime || flight.depart,
-      arriveTime: flight.arriveTime || flight.arrive,
-      price: Number(flight.price) || 0,
-      date: date || flight.date,
-    };
-    dispatch(startBooking(mapped));
-    navigate("/booking");
-  };
+const FlightCard = ({ flight, date, onSelect }) => {
   return (
     <Card>
       <Left>
@@ -67,7 +51,7 @@ const FlightCard = ({ flight, date }) => {
       </Left>
       <Right>
         <Price>${flight.price}</Price>
-        <Button onClick={handleSelect}>Select</Button>
+        <Button onClick={()=>onSelect?.(flight)}>Select</Button>
       </Right>
     </Card>
   );
@@ -81,9 +65,7 @@ FlightCard.propTypes = {
         departTime: PropTypes.string.isRequired,
         arriveTime: PropTypes.string.isRequired,
     }).isRequired,
+    onSelect: PropTypes.func,
 };
 
 export default FlightCard;
-
-
-

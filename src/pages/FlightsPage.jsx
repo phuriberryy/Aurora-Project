@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+﻿import React, { useEffect, useState, useMemo, useRef } from "react";
 import http from "../services/http";
 import FlightList from "../component/flights/FlightList";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
-import { useMemo } from "react";
 import SortSelect from "../component/flights/SortSelect";
 
 const toMin = (hhmm) => {
@@ -23,25 +22,51 @@ const FlightsPage = () => {
 
     const from = params.get("from");
     const to = params.get("to");
-    const date = params.get("date");
+    const departDate = params.get("date");
+    const returnDate = params.get("returnDate");
+    const isReturn = !!returnDate;
+    const returnRef = useRef(null);
+    const [isHighlighting, setIsHighlighting] = useState(false);
 
     useEffect(() => {
-        if (!from || !to || !date) navigate("/", { replace: true });
-    }, [from, to, date, navigate]);
+        if (!from || !to || !departDate) navigate("/", { replace: true });
+    }, [from, to, departDate, navigate]);
 
     const [flights, setFlights] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [sort, setSort] = useState("default");
 
+    const [selOut, setSelOut] = useState(null);
+    const [selRet, setSelRet] = useState(null);
+
     useEffect(() => {
-        if (!from || !to || !date) return;
+        if (!from || !to || !departDate) return;
         const fetchFlights = async () => {
             setLoading(true);
+            setError(null);
             try {
-                const q = { from, to, date };
-                const response = await http.get("/flights", { params: q });
-                setFlights(response.data);
+                if (isReturn) {
+                    const responseDepart = await http.get("/flights", {
+                        params: { from, to, date: departDate }
+                    });
+                    const responseReturn = await http.get("/flights", {
+                        params: { from: to, to: from, date: returnDate }
+                    });
+                    const response = {
+                        data: [
+                            ...(responseDepart.data || []).map(f => ({ ...f, _segment: "outbound" })),
+                            ...(responseReturn.data || []).map(f => ({ ...f, _segment: "return" })),
+                        ]
+                    };
+                    setFlights(response.data);
+                } else {
+                    const response = await http.get("/flights", {
+                        params: { from, to, date: departDate }
+                    });
+                    const list = (response.data || []).map(f => ({ ...f, _segment: "outbound" }));
+                    setFlights(list);
+                }
             } catch (err) {
                 setError(err.message || "Failed to load flights");
             } finally {
@@ -49,7 +74,7 @@ const FlightsPage = () => {
             }
         };
         fetchFlights();
-    }, [from, to, date]);
+    }, [from, to, departDate, isReturn, returnDate]);
 
     const sorted = useMemo(() => {
         const list = [...flights];
@@ -64,6 +89,24 @@ const FlightsPage = () => {
         return cmp ? list.sort(cmp) : list;
     }, [flights, sort]);
 
+    const handleSelect = (flight) => {
+        if (flight._segment === "return") {
+            setSelRet(flight);
+            if (selOut) {
+                navigate("/booking", { state: { outbound: selOut, inbound: flight } });
+            }
+        } else {
+            setSelOut(flight);
+            if (isReturn) {
+                returnRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+                setIsHighlighting(true);
+                setTimeout(() => setIsHighlighting(false), 1000);
+            } else {
+                navigate("/booking", { state: { outbound: flight } });
+            }
+        }
+    };
+
     if (loading) return <p>Loading flights...</p>;
     if (error) return <p>Error loading flights: {error}</p>;
 
@@ -74,8 +117,13 @@ const FlightsPage = () => {
                 display: "flex", justifyContent: "space-between", alignItems: "center",
                 border: "1px solid #eee", borderRadius: 12, padding: "8px 12px", marginBottom: 12
             }}>
-                <div><strong>{from} → {to}</strong> • {date}</div>
-                <Link to={`/?from=${from}&to=${to}&date=${date}`}>Edit search</Link>
+                <div>
+                    <strong>{from} → {to}</strong> • {departDate}
+                    {isReturn && <div><strong>{to} → {from}</strong> • {returnDate}</div>}
+                </div>
+                <Link to={`/?from=${from}&to=${to}&date=${departDate}${isReturn ? `&returnDate=${returnDate}` : ""}`}>
+                    Edit search
+                </Link>
             </div>
             <div style={{ marginBottom: 16 }}>
                 <SortSelect value={sort} onChange={setSort} />
@@ -83,9 +131,35 @@ const FlightsPage = () => {
             {sorted.length === 0 ? (
                 <p>No flights available.</p>
             ) : (
-                <FlightList flights={sorted} date={date} />
-
-            )}
+                <>
+                <FlightList
+                    flights={sorted.filter((f) => f._segment === "outbound")}
+                    date={departDate}
+                    onSelect={handleSelect}
+                />
+                {isReturn && (
+                <>
+                    <h2
+                        ref={returnRef}
+                        style={{
+                            marginTop: 24,
+                            transition: "background-color 0.5s ease",
+                            backgroundColor: isHighlighting
+                                ? "rgba(255, 235, 59, 0.4)"
+                                : "transparent",
+                            padding: "6px 10px",
+                            borderRadius: "8px",
+                        }}
+                    >Return • {to} → {from} • {returnDate}</h2>
+                    <FlightList
+                        flights={sorted.filter((f) => f._segment === "return")}
+                        date={returnDate}
+                        onSelect={handleSelect}
+                    />
+                </>
+                )}   
+                </>
+            )}         
         </div>
     );
 };
