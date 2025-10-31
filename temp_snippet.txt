@@ -1,0 +1,7 @@
+
+          <Input $invalid={errors.contact.email} placeholder="Email" value={booking.contact.email} onChange={(e)=>dispatch(updateContact({email: e.target.value}))} />
+
+          <Input $invalid={errors.contact.phone} placeholder="Phone" value={booking.contact.phone} onChange={(e)=>dispatch(updateContact({phone: e.target.value}))} />
+
+        </Row>
+
