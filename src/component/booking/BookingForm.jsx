@@ -19,7 +19,7 @@ const Card = styled.section`
 
   color: ${({ theme }) => theme.colors.dark};
 
-  border-radius: 12px;
+  border-radius: 20px;
 
   margin-bottom: 16px;
 
