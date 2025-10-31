@@ -1,237 +1,90 @@
+import { useState } from "react";
 import PropTypes from "prop-types";
+
 import styled from "styled-components";
-import { useMemo, useState } from "react";
 
 import Button from "../ui/Button";
 import Input from "../ui/Input";
 import Select from "../ui/Select";
 
 const Card = styled.form`
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  padding: 16px;
+  background: #fff;
   display: grid;
-  gap: 22px;
-  padding: 24px;
-  margin: 20px 0 24px;
-  border-radius: 18px;
-  border: 1px solid rgba(15, 36, 84, 0.12);
-  background: ${({ theme }) => theme.colors.white};
-  box-shadow: 0 18px 32px -18px rgba(15, 36, 84, 0.35);
+  gap: 10px;
 `;
 
 const ToggleRow = styled.div`
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
 `;
 
-const ToggleButton = styled.button.withConfig({
-  shouldForwardProp: (prop) => prop !== "active"
-})`
-  padding: 8px 20px;
+const ToggleBtn = styled.button`
+  padding: 6px 14px;
   border-radius: 20px;
-  border: 1px solid ${({ active }) => (active ? "#0077cc" : "#ccc")};
-  background: ${({ active }) => (active ? "#0077cc" : "#f8f8f8")};
-  color: ${({ active }) => (active ? "#fff" : "#333")};
-  font-weight: 600;
+  border: 1px solid #0077cc;
+  background: ${(p) => (p.$active ? "#0077cc" : "#f2f2f2")};
+  color: ${(p) => (p.$active ? "#fff" : "#000")};
   cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: ${({ active }) => (active ? "#006bb3" : "#eaeaea")};
-  }
 `;
 
-const Row = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) 180px;
-  gap: 16px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const Field = styled.label`
-  display: grid;
-  gap: 6px;
-`;
-
-const Label = styled.span`
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: rgba(15, 36, 84, 0.6);
-`;
-
-const Actions = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-`;
-
-const Validation = styled.small`
-  color: #696969;
-`;
-
-const SearchButton = styled(Button)`
-  min-width: 130px;
-  padding: 12px 28px;
-  border-radius: 8px;
-`;
-
-export default function SearchBar({
-  value,
-  onChange,
-  onSearch,
-  options = { origins: [], destinations: [] },
-  isLoadingOptions = false,
-}) {
-  const [tripType, setTripType] = useState("oneway");
-
-  const from = value.from ?? "";
-  const to = value.to ?? "";
-  const departDate = value.date ?? "";
-  const returnDate = value.returnDate ?? "";
-
-  const { origins = [], destinations = [] } = options;
-
-  const trimmed = useMemo(
-    () => ({
-      from: from.trim(),
-      to: to.trim(),
-      date: departDate,
-      returnDate,
-    }),
-    [from, to, departDate, returnDate]
-  );
-
-  const hasEmpty =
-    !trimmed.from || !trimmed.to || !trimmed.date || (tripType === "return" && !trimmed.returnDate);
-  const sameRoute = trimmed.from && trimmed.to && trimmed.from === trimmed.to;
-
-  const pastDate = useMemo(() => {
-    if (!trimmed.date) return false;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const picked = new Date(trimmed.date);
-    return picked < today;
-  }, [trimmed.date]);
-
-  const isInvalid = hasEmpty || sameRoute || pastDate;
-
-  let validationMessage = "";
-  if (sameRoute) {
-    validationMessage = "Departure and destination must be different.";
-  } else if (pastDate) {
-    validationMessage = "Date cannot be in the past.";
-  }
+export default function SearchBar({ value, onChange, onSearch, options, isLoadingOptions }) {
+  const [trip, setTrip] = useState("oneway");
+  const { from = "", to = "", date = "", returnDate = "" } = value;
+  const { origins = [], destinations = [] } = options || {};
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (isInvalid) return;
-    const searchData =
-      tripType === "return"
-        ? { from: trimmed.from, to: trimmed.to, date: trimmed.date, returnDate: trimmed.returnDate }
-        : { from: trimmed.from, to: trimmed.to, date: trimmed.date };
-    onSearch(searchData);
-  };
-
-  const handleFieldChange = (field) => (e) => {
-    onChange({ [field]: e.target.value });
+    if (!from || !to || !date) return;
+    const data = { from, to, date };
+    if (trip === "return") data.returnDate = returnDate;
+    onSearch(data);
   };
 
   return (
-    <Card onSubmit={handleSubmit} noValidate>
-      {/* Trip type toggle */}
+    <Card onSubmit={handleSubmit}>
+      {/* ปุ่มสลับโหมด */}
       <ToggleRow>
-        <ToggleButton
-          type="button"
-          active={tripType === "oneway"}
-          onClick={() => setTripType("oneway")}
-        >
+        <ToggleBtn type="button" $active={trip === "oneway"} onClick={() => setTrip("oneway")}>
           One-way
-        </ToggleButton>
-        <ToggleButton
-          type="button"
-          active={tripType === "return"}
-          onClick={() => setTripType("return")}
-        >
+        </ToggleBtn>
+        <ToggleBtn type="button" $active={trip === "return"} onClick={() => setTrip("return")}>
           Return
-        </ToggleButton>
+        </ToggleBtn>
       </ToggleRow>
 
-      {/* From / To / Date (+Return date) */}
-      <Row>
-        <Field>
-          <Label>From</Label>
-          <Select
-            value={from}
-            onChange={handleFieldChange("from")}
-            disabled={isLoadingOptions || origins.length === 0}
-          >
-            <option value="">Select departure</option>
-            {origins.map((origin) => (
-              <option key={origin} value={origin}>
-                {origin}
-              </option>
-            ))}
-          </Select>
-        </Field>
+      {/* ช่องกรอกข้อมูล */}
+      <Select value={from} onChange={(e) => onChange({ from: e.target.value })} disabled={isLoadingOptions}>
+        <option value="">Select departure</option>
+        {origins.map((o) => <option key={o}>{o}</option>)}
+      </Select>
 
-        <Field>
-          <Label>To</Label>
-          <Select
-            value={to}
-            onChange={handleFieldChange("to")}
-            disabled={isLoadingOptions || destinations.length === 0}
-          >
-            <option value="">Select destination</option>
-            {destinations.map((destination) => (
-              <option key={destination} value={destination}>
-                {destination}
-              </option>
-            ))}
-          </Select>
-        </Field>
+      <Select value={to} onChange={(e) => onChange({ to: e.target.value })} disabled={isLoadingOptions}>
+        <option value="">Select destination</option>
+        {destinations.map((d) => <option key={d}>{d}</option>)}
+      </Select>
 
-        <Field>
-          <Label>Date</Label>
-          <Input
-            type="date"
-            value={departDate}
-            onChange={handleFieldChange("date")}
-          />
-        </Field>
+      <Input type="date" value={date} onChange={(e) => onChange({ date: e.target.value })} />
 
-        {/* Return Date */}
-        {tripType === "return" && (
-          <Field>
-            <Label>Return Date</Label>
-            <Input
-              type="date"
-              value={returnDate}
-              onChange={handleFieldChange("returnDate")}
-            />
-          </Field>
-        )}
-      </Row>
+      {trip === "return" && (
+        <Input type="date" value={returnDate} onChange={(e) => onChange({ returnDate: e.target.value })} />
+      )}
 
-      <Actions>
-        <SearchButton type="submit" disabled={isInvalid || isLoadingOptions}>
-          Search
-        </SearchButton>
-        {validationMessage && <Validation>{validationMessage}</Validation>}
-      </Actions>
+      <Button type="submit" disabled={isLoadingOptions}>
+        Search
+      </Button>
     </Card>
   );
 }
 
 SearchBar.propTypes = {
   value: PropTypes.shape({
-    from: PropTypes.string.isRequired,
-    to: PropTypes.string.isRequired,
-    date: PropTypes.string.isRequired,
+    from: PropTypes.string,
+    to: PropTypes.string,
+    date: PropTypes.string,
     returnDate: PropTypes.string,
   }).isRequired,
   onChange: PropTypes.func.isRequired,
@@ -242,4 +95,5 @@ SearchBar.propTypes = {
   }),
   isLoadingOptions: PropTypes.bool,
 };
+
 

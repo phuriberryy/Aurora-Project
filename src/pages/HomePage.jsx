@@ -1,107 +1,76 @@
 import { useEffect, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
 import SearchBar from "../component/search/SearchBar";
 import { getFlights } from "../services/api";
-
-
-const Container = styled.main`
-  max-width: 720px;
-  margin: 48px auto;
-  padding: 0 20px 60px;
-`;
-
-const Title = styled.h1`
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: ${({ theme }) => theme.colors.primary};
-  margin: 0 0 12px;
-`;
-
-const ErrorMessage = styled.p`
-  margin: 8px 0 0;
-  color: #d64545;
-  font-size: 0.95rem;
-`;
 
 export default function HomePage() {
   const navigate = useNavigate();
 
-  const [query, setQuery] = useState({
-    from: "",
-    to: "",
-    date: "",
-  });
+  // เก็บค่าที่ผู้ใช้กรอก
+  const [query, setQuery] = useState({ from: "", to: "", date: "" });
+  // เก็บรายชื่อสนามบินทั้งหมด
+  const [options, setOptions] = useState({ origins: [], destinations: [] });
+  // สถานะโหลดข้อมูล
+  const [loading, setLoading] = useState(true);
+  // ถ้ามี error ตอนโหลด
+  const [error, setError] = useState("");
 
-  const [searchOptions, setSearchOptions] = useState({ origins: [], destinations: [] });
-  const [isLoadingOptions, setIsLoadingOptions] = useState(true);
-  const [optionsError, setOptionsError] = useState(null);
-
+  // โหลดรายชื่อสนามบินจาก API
   useEffect(() => {
-    let isMounted = true;
-
-    const loadOptions = async () => {
-      setIsLoadingOptions(true);
+    async function loadAirports() {
       try {
-        const response = await getFlights();
-        if (!isMounted) return;
+        const res = await getFlights();
+        const flights = res?.data || [];
+        const origins = [];
+        const destinations = [];
 
-        const origins = new Set();
-        const destinations = new Set();
-
-        response.data.forEach((flight) => {
-          if (flight?.from) origins.add(flight.from.trim());
-          if (flight?.to) destinations.add(flight.to.trim());
-        });
-
-        setSearchOptions({
-          origins: Array.from(origins).sort((a, b) => a.localeCompare(b)),
-          destinations: Array.from(destinations).sort((a, b) => a.localeCompare(b)),
-        });
-        setOptionsError(null);
-      } catch (error) {
-        if (!isMounted) return;
-        setOptionsError("Failed to load airports. Please refresh and try again.");
-        setSearchOptions({ origins: [], destinations: [] });
-      } finally {
-        if (isMounted) {
-          setIsLoadingOptions(false);
+        // วนลูปเที่ยวบิน แล้วดึงชื่อสนามบินต้นทาง/ปลายทาง (กันซ้ำ)
+        for (let f of flights) {
+          if (f.from && !origins.includes(f.from)) origins.push(f.from);
+          if (f.to && !destinations.includes(f.to)) destinations.push(f.to);
         }
+
+        origins.sort();
+        destinations.sort();
+        setOptions({ origins, destinations });
+        setError("");
+      } catch (e) {
+        setError("โหลดรายชื่อสนามบินไม่สำเร็จ");
+        setOptions({ origins: [], destinations: [] });
+      } finally {
+        setLoading(false);
       }
-    };
-
-    loadOptions();
-
-    return () => {
-      isMounted = false;
-    };
+    }
+    loadAirports();
   }, []);
 
-  const handleQueryChange = (partial) => {
-    setQuery((prev) => ({ ...prev, ...partial }));
-  };
+  // เวลาเปลี่ยนค่าในช่อง input
+  function handleChange(part) {
+    setQuery((old) => ({ ...old, ...part }));
+  }
 
-  const handleSearch = ({ from, to, date }) => {
-    const params = new URLSearchParams({
-      from,
-      to,
-      date,
-    });
-
-    navigate(`/flights?${params.toString()}`);
-  };
+  // เวลา user กด Search
+  function handleSearch({ from, to, date }) {
+    const params = new URLSearchParams({ from, to, date }).toString();
+    navigate(`/flights?${params}`);
+  }
 
   return (
-    <Container>
-      <Title>Find your flight</Title>
+    <main style={{ maxWidth: 720, margin: "50px auto", padding: "0 20px" }}>
+      <h1>Find your flight</h1>
+
       <SearchBar
         value={query}
-        onChange={handleQueryChange}
+        onChange={handleChange}
         onSearch={handleSearch}
-        options={searchOptions}
-        isLoadingOptions={isLoadingOptions}
+        options={options}
+        isLoadingOptions={loading}
       />
-      {optionsError && <ErrorMessage>{optionsError}</ErrorMessage>} </Container>
+
+      {error && <p style={{ color: "red" }}>{error}</p>}
+    </main>
   );
 }
+
 
