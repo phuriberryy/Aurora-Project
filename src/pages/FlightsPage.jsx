@@ -3,6 +3,19 @@ import http from "../services/http";
 import FlightList from "../component/flights/FlightList";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { useMemo } from "react";
+import SortSelect from "../component/flights/SortSelect";
+
+const toMin = (hhmm) => {
+    const [h, m] = hhmm.split(":").map(Number);
+    return h * 60 + m;
+};
+const durToMin = (s) => {
+    if (typeof s === "string" && /h/i.test(s)) {
+        const m = s.match(/(\d+)h\s*(\d+)m?/i);
+        if (m) return (+m[1]) * 60 + (+m[2] || 0);
+    }
+    return 0;
+};
 
 const FlightsPage = () => {
     const navigate = useNavigate();
@@ -19,10 +32,7 @@ const FlightsPage = () => {
     const [flights, setFlights] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-
-    const [minPrice, setMinPrice] = useState("");
-    const [maxPrice, setMaxPrice] = useState("");
-    const [status, setStatus] = useState("");
+    const [sort, setSort] = useState("default");
 
     useEffect(() => {
         if (!from || !to || !date) return;
@@ -33,7 +43,7 @@ const FlightsPage = () => {
                 const response = await http.get("/flights", { params: q });
                 setFlights(response.data);
             } catch (err) {
-                setError(err.message);
+                setError(err.message || "Failed to load flights");
             } finally {
                 setLoading(false);
             }
@@ -41,16 +51,18 @@ const FlightsPage = () => {
         fetchFlights();
     }, [from, to, date]);
 
-    const filtered = useMemo(() => {
-        const min = minPrice === "" ? -Infinity : Number(minPrice);
-        const max = maxPrice === "" ? Infinity : Number(maxPrice);
-        return flights.filter(f => {
-            const okMin = f.price >= min;
-            const okMax = f.price <= max;
-            const okStatus = !status || f.status === status;
-            return okMin && okMax && okStatus;
-        });
-    }, [flights, minPrice, maxPrice, status]);
+    const sorted = useMemo(() => {
+        const list = [...flights];
+        const cmp = {
+            price: (a, b) => (+a.price || 0) - (+b.price || 0),
+            departTime: (a, b) => toMin(a.departTime) - toMin(b.departTime),
+            arriveTime: (a, b) => toMin(a.arriveTime) - toMin(b.arriveTime),
+            duration: (a, b) =>
+                (a.duration ? durToMin(a.duration) : toMin(a.arriveTime) - toMin(a.departTime)) -
+                (b.duration ? durToMin(b.duration) : toMin(b.arriveTime) - toMin(b.departTime)),
+        }[sort];
+        return cmp ? list.sort(cmp) : list;
+    }, [flights, sort]);
 
     if (loading) return <p>Loading flights...</p>;
     if (error) return <p>Error loading flights: {error}</p>;
@@ -58,31 +70,21 @@ const FlightsPage = () => {
     return (
         <div>
             <h1>Available Flights</h1>
-            <strong>Filter by Price:</strong>
-            <Link to={`/?from=${from}&to=${to}&date=${date}`}>Edit search</Link>
-            <div style={{ display: "flex", gap: 12, alignItems: "center", margin: "8px 0 16px" }}>
-                <input
-                    type="number" placeholder="Min ฿"
-                    value={minPrice} onChange={(e) => setMinPrice(e.target.value)}
-                    style={{ width: 110 }}
-                />
-                <input
-                    type="number" placeholder="Max ฿"
-                    value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)}
-                    style={{ width: 110 }}
-                />
-                <select value={status} onChange={(e) => setStatus(e.target.value)}>
-                    <option value="">All status</option>
-                    <option value="On Time">On Time</option>
-                    <option value="Delayed">Delayed</option>
-                    <option value="Cancelled">Cancelled</option>
-                </select>
+            <div style={{
+                display: "flex", justifyContent: "space-between", alignItems: "center",
+                border: "1px solid #eee", borderRadius: 12, padding: "8px 12px", marginBottom: 12
+            }}>
+                <div><strong>{from} → {to}</strong> • {date}</div>
+                <Link to={`/?from=${from}&to=${to}&date=${date}`}>Edit search</Link>
             </div>
-            {filtered.length === 0 ? (
+            <div style={{ marginBottom: 16 }}>
+                <SortSelect value={sort} onChange={setSort} />
+            </div>
+            {sorted.length === 0 ? (
                 <p>No flights available.</p>
             ) : (
-                <FlightList flights={filtered} date={date} />
-                
+                <FlightList flights={sorted} date={date} />
+
             )}
         </div>
     );
