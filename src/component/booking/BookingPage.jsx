@@ -8,6 +8,7 @@ import { useLocation } from 'react-router-dom';
 import BookingForm from './BookingForm';
 import Summary from './Summary';
 import { selectStep, selectBooking, startBooking, updateFlight, updateReturnFlight } from './bookingSlice';
+import { listHistory, deleteByTimestamp, clearHistory } from './localHistory';
 
 
 // ===========================
@@ -70,16 +71,14 @@ export default function BookingPage(){
     const outbound = norm(st.outbound || st.flight || st.selected);
     const inbound = norm(st.inbound);
     if (!outbound && !inbound) return;
+    // Always restart booking when user selects a flight (even if same id)
     if (outbound) {
-      if (!flight || flight.id !== outbound.id) {
-        dispatch(startBooking(outbound));
-      } else {
-        dispatch(updateFlight(outbound));
-      }
+      dispatch(startBooking(outbound));
+    } else if (inbound) {
+      // fallback: start with inbound if outbound missing
+      dispatch(startBooking(inbound));
     }
-    if (inbound) {
-      dispatch(updateReturnFlight(inbound));
-    }
+    if (inbound) dispatch(updateReturnFlight(inbound));
   }, [location?.state, dispatch, flight?.id]);
 
   // ===========================
@@ -180,6 +179,23 @@ export default function BookingPage(){
 
           {/* แจ้งส่งอีเมล e-ticket */}
           <p>We sent your e-ticket to your email.</p>
+
+          {/* Manage local booking history (JSON-backed via localStorage seed) */}
+          <div style={{ marginTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {/* Simple helpers live here to avoid touching non-Booking files */}
+            <button onClick={() => {
+              try {
+                const list = listHistory() || [];
+                const last = list.filter(it => it && it.type === 'booking').sort((a,b)=> (b.timestamp||0)-(a.timestamp||0))[0];
+                if (last) deleteByTimestamp(last.timestamp);
+              } catch (_) {}
+            }}>Remove latest from history</button>
+            <button onClick={() => {
+              try {
+                if (window.confirm('Clear all saved booking history?')) clearHistory();
+              } catch (_) {}
+            }}>Clear all history</button>
+          </div>
         </Card>
       )}
     </Container>

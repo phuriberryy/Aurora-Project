@@ -11,6 +11,7 @@ import { addPassenger, removePassenger, updatePassenger, updateContact, updateEx
 import { getFlight } from '../../services/api';
 
 import MultiSeatPicker from './MultiSeatPicker';
+import { getReservedSeatsForFlight, anyNameExists } from './localHistory';
 
 
 // ===========================
@@ -219,6 +220,10 @@ export default function BookingForm() {
       const pErr = { firstName: false, lastName: false };
       if (!p.firstName || String(p.firstName).trim() === '') pErr.firstName = true;
       if (!p.lastName || String(p.lastName).trim() === '') pErr.lastName = true;
+      const full = `${String(p.firstName||'').trim()} ${String(p.lastName||'').trim()}`.trim();
+      if (full && anyNameExists(full)) {
+        pErr.firstName = true; pErr.lastName = true;
+      }
       if (pErr.firstName || pErr.lastName) nextErrors.passengers[p.id] = pErr;
     });
     setErrors(nextErrors);
@@ -329,6 +334,7 @@ export default function BookingForm() {
         <MultiSeatPicker
           capacity={booking.passengers.length}
           value={booking.extras.seats || []}
+          reserved={getReservedSeatsForFlight(booking?.flight?.id, booking?.flight?.date)}
           onChange={(arr)=>dispatch(updateExtras({ seats: arr, seatPref: (arr && arr.length>0) ? arr[0] : 'AUTO' }))}
         />
 
