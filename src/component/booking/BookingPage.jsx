@@ -178,24 +178,10 @@ export default function BookingPage(){
           )}
 
           {/* แจ้งส่งอีเมล e-ticket */}
-          <p>We sent your e-ticket to your email.</p>
+          <p>We sent your e-ticket to your email - Thank you 😜</p>
 
-          {/* Manage local booking history (JSON-backed via localStorage seed) */}
-          <div style={{ marginTop: 12, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {/* Simple helpers live here to avoid touching non-Booking files */}
-            <button onClick={() => {
-              try {
-                const list = listHistory() || [];
-                const last = list.filter(it => it && it.type === 'booking').sort((a,b)=> (b.timestamp||0)-(a.timestamp||0))[0];
-                if (last) deleteByTimestamp(last.timestamp);
-              } catch (_) {}
-            }}>Remove latest from history</button>
-            <button onClick={() => {
-              try {
-                if (window.confirm('Clear all saved booking history?')) clearHistory();
-              } catch (_) {}
-            }}>Clear all history</button>
-          </div>
+          
+          
         </Card>
       )}
     </Container>
