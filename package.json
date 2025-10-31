@@ -1,6 +1,7 @@
 {
   "name": "aurora-project",
   "version": "0.1.0",
+  "homepage": "https://phuriberryy.github.io/Aurora-Project",
   "private": true,
   "dependencies": {
     "@reduxjs/toolkit": "^2.9.2",

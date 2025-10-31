@@ -14,12 +14,16 @@ const Card = styled.form`
   background: #fff;
   display: grid;
   gap: 10px;
+  width: min(100%, 420px);
+  margin: 0 auto;
+  box-sizing: border-box;
 `;
 //One-way / Return
 const ToggleRow = styled.div`
   display: flex;
   justify-content: center;
   gap: 8px;
+  flex-wrap: wrap;
 `;
 // ปุ่มสลับโหมด One-way / Return
 const ToggleBtn = styled.button`
