@@ -50,7 +50,7 @@ const FlightCard = ({ flight, date, onSelect }) => {
         </div>
       </Left>
       <Right>
-        <Price>${flight.price}</Price>
+        <Price>THB {flight.price}</Price>
         <Button onClick={()=>onSelect?.(flight)}>Select</Button>
       </Right>
     </Card>
