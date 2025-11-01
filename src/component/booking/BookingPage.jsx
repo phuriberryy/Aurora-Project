@@ -7,8 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import BookingForm from './BookingForm';
 import Summary from './Summary';
-import { selectStep, selectBooking, startBooking, updateFlight, updateReturnFlight } from './bookingSlice';
-import { listHistory, deleteByTimestamp, clearHistory } from './localHistory';
+import { selectStep, selectBooking, startBooking, updateReturnFlight } from './bookingSlice';
 
 
 // ===========================
